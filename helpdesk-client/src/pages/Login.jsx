@@ -14,62 +14,31 @@ function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
   e.preventDefault();
-  const token =
-  localStorage.getItem(
-    "token"
-  );
 
-const response =
-  await fetch(
-    "http://localhost:5213/api/tickets",
-    {
-      headers: {
-        Authorization:
-          `Bearer ${token}`,
-      },
-    }
-  );
   try {
     const response = await fetch(
       "http://localhost:5213/api/auth/login",
       {
         method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
-
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
       }
     );
 
-    const data =
-      await response.json();
+    const data = await response.json();
 
     if (response.ok) {
-
-      localStorage.setItem(
-        "token",
-        data.token
-      );
-
+      localStorage.setItem("token", data.token);
       navigate("/dashboard");
-
     } else {
       alert(data.message);
     }
-
   } catch (error) {
     console.error(error);
     alert("Server error");
   }
-
 };
 
 

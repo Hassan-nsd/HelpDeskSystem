@@ -4,6 +4,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using HelpDesk.API.Data;
+using Microsoft.EntityFrameworkCore;
+
 
 
 
@@ -54,6 +57,10 @@ builder.Services
     });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
