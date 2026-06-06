@@ -1,7 +1,7 @@
 body {
   margin: 0;
   font-family: Inter, sans-serif; 
-  background-image: url(C:\Users\User\HelpDeskSystem\helpdesk-client\src\images\background.jpeg);
+  background-image: url("../images/background.jpeg");
   /* background: linear-gradient(90deg, #07056b, #2a0154); */
    background-size: cover;
   background-position: center;
