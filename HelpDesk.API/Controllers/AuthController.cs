@@ -111,15 +111,16 @@ namespace HelpDesk.API.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        // ROLE MAPPING (IMPORTANT FOR YOUR REDIRECT LOGIC)
-        private string GetRoleName(int roleId)
-        {
-            return roleId switch
-            {
-                1 => "Admin",
-                2 => "Employee",
-                _ => "User"
-            };
-        }
-    }
+          private string GetRoleName(int roleId)
+          {
+               return roleId switch
+               {
+                    1 => "Admin",
+                    2 => "Employee",
+                    3 => "Support Agent",
+                    4 => "Manager",
+                    _ => "User"
+               };
+          }
+     }
 }

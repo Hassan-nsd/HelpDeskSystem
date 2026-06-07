@@ -2,20 +2,8 @@ import "../styles/Dashboard.css";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDashboard } from "../services/api";
-
-import {
-  FaBars,
-  FaBell,
-  FaUserCircle,
-  FaHome,
-  FaPlusSquare,
-  FaTicketAlt,
-  FaBook,
-  FaChartBar,
-  FaUsers,
-  FaCog,
-  FaSignOutAlt,
-} from "react-icons/fa";
+import NavBar from "../components/navbar";
+import TopBar from "../components/topbar";
 
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
@@ -68,74 +56,46 @@ function Dashboard() {
     }
   }
 
+  const getStatusClass = (status) => {
+    switch (status?.toLowerCase()) {
+      case "open":
+        return "open";
+      case "in progress":
+        return "progress";
+      case "pending":
+        return "pending";
+      case "resolved":
+        return "resolved";
+      case "closed":
+        return "closed";
+      default:
+        return "";
+    }
+  };
+
+  const getPriorityClass = (priority) => {
+    switch (priority?.toLowerCase()) {
+      case "high":
+        return "high";
+      case "medium":
+        return "medium";
+      case "low":
+        return "low";
+      default:
+        return "";
+    }
+  };
+
   function goToTickets() {
     navigate("/tickets");
   }
 
   return (
     <div className="dashboard-container">
-      {/* Sidebar */}
-      <aside className="sidebar">
-        <div className="logo">
-          <h2>IT Help Desk</h2>
-          <span>Ticketing System</span>
-        </div>
-
-        <nav>
-          <a className="active">
-            <FaHome /> Dashboard
-          </a>
-
-          <a>
-            <FaPlusSquare /> Create Ticket
-          </a>
-
-          <a href="/tickets">
-            <FaTicketAlt /> My Tickets
-          </a>
-
-          <a>
-            <FaBook /> Knowledge Base
-          </a>
-
-          <a>
-            <FaChartBar /> Reports
-          </a>
-
-          <a>
-            <FaUsers /> Users
-          </a>
-
-          <a>
-            <FaCog /> Settings
-          </a>
-
-          <a className="logout">
-            <FaSignOutAlt /> Logout
-          </a>
-        </nav>
-      </aside>
+      <NavBar />
       {/* Main */}
       <main className="main-content">
-        {/* Navbar */}
-        <header className="topbar">
-          <div className="left">
-            <FaBars />
-            <input type="text" placeholder="Search tickets..." />
-          </div>
-
-          <div className="right">
-            <FaBell className="icon" />
-
-            <div className="user-info">
-              <FaUserCircle size={35} />
-              <div>
-                <h4>{localStorage.fullName}</h4>
-                <span>{roleName()}</span>
-              </div>
-            </div>
-          </div>
-        </header>
+        <TopBar />
 
         <h2 className="page-title">Dashboard Overview</h2>
 
@@ -210,9 +170,20 @@ function Dashboard() {
 
                     <td>{ticket.requester || ticket.createdBy || "-"}</td>
 
-                    <td>{ticket.status}</td>
-
-                    <td>{ticket.priority}</td>
+                    <td>
+                      <span
+                        className={`status ${getStatusClass(ticket.status)}`}
+                      >
+                        {ticket.status}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className={`priority ${getPriorityClass(ticket.priority)}`}
+                      >
+                        {ticket.priority}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>{" "}
