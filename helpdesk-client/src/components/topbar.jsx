@@ -1,7 +1,7 @@
 import { FaBars, FaBell, FaUserCircle } from "react-icons/fa";
 import "../styles/topbar.css";
 
-function TopBar() {
+function TopBar({ toggleSidebar }) {
   function roleName() {
     if (localStorage.roleId == 1) return "Admin";
     if (localStorage.roleId == 2) return "Employee";
@@ -13,7 +13,7 @@ function TopBar() {
   return (
     <header className="topbar">
       <div className="left">
-        <FaBars />
+        <FaBars className="menu-btn" onClick={toggleSidebar} />{" "}
         <input type="text" placeholder="Search tickets..." />
       </div>
 

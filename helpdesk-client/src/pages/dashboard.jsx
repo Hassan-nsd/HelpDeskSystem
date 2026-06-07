@@ -22,6 +22,7 @@ function Dashboard() {
 
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const data = [
     { name: "Open", value: dashboard?.openTickets ?? 0 },
@@ -92,10 +93,10 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <NavBar />
+      <NavBar isOpen={sidebarOpen} />
       {/* Main */}
       <main className="main-content">
-        <TopBar />
+        <TopBar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
         <h2 className="page-title">Dashboard Overview</h2>
 

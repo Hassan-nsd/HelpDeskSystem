@@ -3,6 +3,7 @@ import "../styles/createTicket.css";
 import "../styles/Dashboard.css";
 import NavBar from "../components/navbar";
 import TopBar from "../components/topbar";
+import createTicket from "../images/create_ticket.png";
 
 function CreateTicket() {
   const [ticket, setTicket] = useState({
@@ -14,6 +15,8 @@ function CreateTicket() {
 
   const [categories, setCategories] = useState([]);
   const [priorities, setPriorities] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
 
   useEffect(() => {
     loadDropdowns();
@@ -88,82 +91,86 @@ function CreateTicket() {
   return (
     <>
       <div className="dashboard-container">
-        <NavBar />
+        <NavBar isOpen={sidebarOpen} />
         <main className="main-content">
-          <TopBar />
+          <TopBar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
           <div className="create-ticket-page">
             <div className="page-header">
               <h2>Create Ticket</h2>
             </div>
+            <div className="create-ticket-content">
+              <div className="form-card">
+                <form onSubmit={handleSubmit}>
+                  <div className="form-group">
+                    <label>Title</label>
 
-            <div className="form-card">
-              <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label>Title</label>
+                    <input
+                      type="text"
+                      name="title"
+                      value={ticket.title}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
 
-                  <input
-                    type="text"
-                    name="title"
-                    value={ticket.title}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
+                  <div className="form-group">
+                    <label>Category</label>
 
-                <div className="form-group">
-                  <label>Category</label>
+                    <select
+                      name="categoryId"
+                      value={ticket.categoryId}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Select Category</option>
 
-                  <select
-                    name="categoryId"
-                    value={ticket.categoryId}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Select Category</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                  <div className="form-group">
+                    <label>Priority</label>
 
-                <div className="form-group">
-                  <label>Priority</label>
+                    <select
+                      name="priorityId"
+                      value={ticket.priorityId}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Select Priority</option>
 
-                  <select
-                    name="priorityId"
-                    value={ticket.priorityId}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Select Priority</option>
+                      {priorities.map((priority) => (
+                        <option key={priority.id} value={priority.id}>
+                          {priority.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-                    {priorities.map((priority) => (
-                      <option key={priority.id} value={priority.id}>
-                        {priority.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                  <div className="form-group">
+                    <label>Description</label>
 
-                <div className="form-group">
-                  <label>Description</label>
+                    <textarea
+                      rows="5"
+                      name="description"
+                      value={ticket.description}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
 
-                  <textarea
-                    rows="6"
-                    name="description"
-                    value={ticket.description}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <button type="submit" className="submit-btn">
-                  Create Ticket
-                </button>
-              </form>
+                  <button type="submit" className="submit-btn">
+                    Create Ticket
+                  </button>
+                </form>
+              </div>
+              <div className="image">
+                <img src={createTicket} alt="Create Ticket Illustration" />
+              </div>
             </div>
           </div>
         </main>

@@ -108,7 +108,7 @@ function Login() {
               <a href="/">Forgot password?</a>
             </div>
 
-            <button type="submit">Sign In</button>
+            <button className="login-btn" type="submit">Sign In</button>
 
             <div className="footer-text">
               Don’t have an account?

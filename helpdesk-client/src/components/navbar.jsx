@@ -11,7 +11,7 @@ import {
 } from "react-icons/fa";
 import "../styles/navbar.css";
 
-function NavBar() {
+function NavBar({ isOpen }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -26,14 +26,15 @@ function NavBar() {
           to="/createTicket"
           className={({ isActive }) => (isActive ? "active" : "")}
         >
-          <FaPlusSquare /> Create Ticket
+          <FaPlusSquare />
+          <span>Create Ticket</span>
         </NavLink>
       );
     }
   }
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? "open" : ""}`}>
       <div className="logo">
         <h2>IT Help Desk</h2>
         <span>Ticketing System</span>
@@ -45,48 +46,47 @@ function NavBar() {
           to="/dashboard"
           className={({ isActive }) => (isActive ? "active" : "")}
         >
-          <FaHome /> Dashboard
+          <FaHome />
+          <span>Dashboard</span>
         </NavLink>
 
         {addCreateTicket()}
-
-        {/* <NavLink
-          to="/create-ticket"
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          <FaPlusSquare /> Create Ticket
-        </NavLink> */}
 
         <NavLink
           to="/tickets"
           className={({ isActive }) => (isActive ? "active" : "")}
         >
-          <FaTicketAlt /> My Tickets
+          <FaTicketAlt />
+          <span>My Tickets</span>
         </NavLink>
 
         <NavLink
           to="/reports"
           className={({ isActive }) => (isActive ? "active" : "")}
         >
-          <FaChartBar /> Reports
+          <FaChartBar />
+          <span>Reports</span>
         </NavLink>
 
         <NavLink
           to="/users"
           className={({ isActive }) => (isActive ? "active" : "")}
         >
-          <FaUsers /> Users
+          <FaUsers />
+          <span>Users</span>
         </NavLink>
 
         <NavLink
           to="/settings"
           className={({ isActive }) => (isActive ? "active" : "")}
         >
-          <FaCog /> Settings
+          <FaCog />
+          <span>Settings</span>
         </NavLink>
 
         <a id="logout" onClick={handleLogout}>
-          <FaSignOutAlt /> Logout
+          <FaSignOutAlt />
+          <span> Logout </span>
         </a>
       </nav>
     </aside>

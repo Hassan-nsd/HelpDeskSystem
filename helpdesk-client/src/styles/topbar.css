@@ -35,3 +35,61 @@
   color: #9ca3af;
   font-size: 13px;
 }
+
+.menu-btn {
+  cursor: pointer;
+  font-size: 22px;
+  display: none;
+}
+
+/* Tablet */
+@media (min-width: 577px) and (max-width: 768px) {
+  .menu-btn {
+    display: none; 
+  }
+
+  .left input {
+    display: none;
+  }
+
+  .left {
+    flex: 0;
+  }
+
+  .right {
+    margin-left: auto;
+  }
+}
+
+/* Phone */
+@media (max-width: 576px) {
+  .menu-btn {
+    display: block;
+  }
+
+  .topbar {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .left {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .left input {
+    display: none;
+  }
+
+  .right {
+    gap: 10px;
+  }
+
+  .user-info h4 {
+    font-size: 13px;
+  }
+
+  .user-info span {
+    font-size: 11px;
+  }
+}

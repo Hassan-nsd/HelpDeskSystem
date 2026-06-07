@@ -9,6 +9,8 @@ import "../styles/tickets.css";
 function Tickets() {
   const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
 
   useEffect(() => {
     loadTickets();
@@ -66,11 +68,11 @@ function Tickets() {
 
   return (
     <div className="dashboard-container">
-      <NavBar />
+      <NavBar isOpen={sidebarOpen} />
 
       {/* MAIN */}
       <main className="main-content">
-        <TopBar />
+        <TopBar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
         <h2 className="page-title">My Tickets</h2>
         <div className="table-card">
