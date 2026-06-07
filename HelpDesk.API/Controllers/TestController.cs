@@ -24,7 +24,7 @@ namespace HelpDesk.API.Controllers
             {
                 var users = await _context.Users
                     .Select(u => new { u.Id, u.Email, })
-                    .Take(5)
+                    .Take(10)
                     .ToListAsync();
 
                 return Ok(users);

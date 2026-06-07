@@ -2,11 +2,7 @@ import "../styles/Login.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import {
-  FaHeadset,
-  FaRegUser,
-  FaLock
-} from "react-icons/fa";
+import { FaHeadset, FaRegUser, FaLock } from "react-icons/fa";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -15,55 +11,49 @@ function Login() {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const response = await fetch("http://localhost:5213/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
-    });
-
-    // read raw text first (safe for non-JSON responses)
-    const text = await response.text();
-    console.log("API raw response:", text);
-
-    // try to parse JSON if possible
-    let data;
     try {
-      data = text ? JSON.parse(text) : null;
-    } catch (parseErr) {
-      console.warn("Response is not JSON:", parseErr);
-      data = { message: text };
-    }
+      const response = await fetch("http://localhost:5213/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (response.ok) {
-      localStorage.setItem("token", data?.token);
-      localStorage.setItem("roleId", data?.user?.roleId);
-      localStorage.setItem("fullName", data?.user?.fullName);
+      // read raw text first (safe for non-JSON responses)
+      const text = await response.text();
+      console.log("API raw response:", text);
 
-      const roleId = data?.user?.roleId;
-
-      if (roleId === 1) {
-        navigate("/AdminDashboard");
-      } 
-      else if (roleId === 2) {
-        navigate("/Dashboard");
+      // try to parse JSON if possible
+      let data;
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch (parseErr) {
+        console.warn("Response is not JSON:", parseErr);
+        data = { message: text };
       }
-    } else {
-      // show server message or raw text
-      alert(data?.message ?? data ?? "Login failed");
+
+      if (response.ok) {
+        localStorage.setItem("token", data?.token);
+        localStorage.setItem("roleId", data?.user?.roleId);
+        localStorage.setItem("fullName", data?.user?.fullName);
+
+        const roleId = data?.user?.roleId;
+
+        navigate("/Dashboard");
+      } else {
+        // show server message or raw text
+        alert(data?.message ?? data ?? "Login failed");
+      }
+    } catch (error) {
+      console.error("Network or client error:", error);
+      alert("Server error");
     }
-  } catch (error) {
-    console.error("Network or client error:", error);
-    alert("Server error");
-  }
-};
+  };
 
   return (
     <div className="login-wrapper">
       <div className="login-container">
-
         {/* LEFT SIDE */}
         <div className="left-panel">
           <div className="brand">
@@ -84,9 +74,7 @@ function Login() {
 
         {/* RIGHT SIDE */}
         <div className="right-panel">
-
           <form onSubmit={handleSubmit} className="login-box">
-
             <h2>Sign In</h2>
 
             <label>Email</label>
@@ -120,19 +108,14 @@ function Login() {
               <a href="/">Forgot password?</a>
             </div>
 
-            <button type="submit">
-              Sign In
-            </button>
+            <button type="submit">Sign In</button>
 
             <div className="footer-text">
               Don’t have an account?
               <span> Contact Admin</span>
             </div>
-
           </form>
-
         </div>
-
       </div>
     </div>
   );

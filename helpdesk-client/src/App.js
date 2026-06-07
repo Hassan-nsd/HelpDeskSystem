@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/dashboard";
 import AdminDashboard from "./pages/adminDashboard";
 import Tickets from "./pages/Tickets.jsx";
+import CreateTicket from "./pages/createTicket.jsx";
 
 function App() {
   return (
@@ -16,6 +17,8 @@ function App() {
         <Route path="/adminDashboard" element={<AdminDashboard />} />
 
         <Route path="/tickets" element={<Tickets />} />
+
+        <Route path="/createTicket" element={<CreateTicket />} />
       </Routes>
     </BrowserRouter>
   );

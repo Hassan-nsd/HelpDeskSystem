@@ -19,6 +19,19 @@ function NavBar() {
     navigate("/");
   };
 
+  function addCreateTicket() {
+    if (localStorage.roleId == 1 || localStorage.roleId == 2) {
+      return (
+        <NavLink
+          to="/createTicket"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          <FaPlusSquare /> Create Ticket
+        </NavLink>
+      );
+    }
+  }
+
   return (
     <aside className="sidebar">
       <div className="logo">
@@ -35,25 +48,20 @@ function NavBar() {
           <FaHome /> Dashboard
         </NavLink>
 
-        <NavLink
+        {addCreateTicket()}
+
+        {/* <NavLink
           to="/create-ticket"
           className={({ isActive }) => (isActive ? "active" : "")}
         >
           <FaPlusSquare /> Create Ticket
-        </NavLink>
+        </NavLink> */}
 
         <NavLink
           to="/tickets"
           className={({ isActive }) => (isActive ? "active" : "")}
         >
           <FaTicketAlt /> My Tickets
-        </NavLink>
-
-        <NavLink
-          to="/knowledge-base"
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          <FaBook /> Knowledge Base
         </NavLink>
 
         <NavLink
@@ -77,7 +85,7 @@ function NavBar() {
           <FaCog /> Settings
         </NavLink>
 
-        <a className="logout" onClick={handleLogout}>
+        <a id="logout" onClick={handleLogout}>
           <FaSignOutAlt /> Logout
         </a>
       </nav>
