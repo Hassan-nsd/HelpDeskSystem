@@ -82,6 +82,8 @@ function Dashboard() {
         return "medium";
       case "low":
         return "low";
+      case "critical":
+        return "critical";
       default:
         return "";
     }
@@ -93,7 +95,10 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <NavBar isOpen={sidebarOpen} />
+      <NavBar
+        isOpen={sidebarOpen}
+        toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+      />
       {/* Main */}
       <main className="main-content">
         <TopBar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />

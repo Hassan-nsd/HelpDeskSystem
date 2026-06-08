@@ -4,6 +4,7 @@ import "../styles/Dashboard.css";
 import NavBar from "../components/navbar";
 import TopBar from "../components/topbar";
 import createTicket from "../images/create_ticket.png";
+import Select from "react-select/base";
 
 function CreateTicket() {
   const [ticket, setTicket] = useState({
@@ -91,7 +92,7 @@ function CreateTicket() {
   return (
     <>
       <div className="dashboard-container">
-        <NavBar isOpen={sidebarOpen} />
+        <NavBar isOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         <main className="main-content">
           <TopBar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
           <div className="create-ticket-page">

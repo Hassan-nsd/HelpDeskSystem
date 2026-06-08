@@ -18,7 +18,7 @@ function TopBar({ toggleSidebar }) {
       </div>
 
       <div className="right">
-        <FaBell className="icon" />
+        <FaBell className="icon" /> 
 
         <div className="user-info">
           <FaUserCircle size={35} />

@@ -11,7 +11,6 @@ function Tickets() {
   const [tickets, setTickets] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-
   useEffect(() => {
     loadTickets();
 
@@ -61,6 +60,8 @@ function Tickets() {
         return "medium";
       case "low":
         return "low";
+      case "critical":
+        return "critical";
       default:
         return "";
     }
@@ -68,7 +69,10 @@ function Tickets() {
 
   return (
     <div className="dashboard-container">
-      <NavBar isOpen={sidebarOpen} />
+      <NavBar
+        isOpen={sidebarOpen}
+        toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+      />
 
       {/* MAIN */}
       <main className="main-content">

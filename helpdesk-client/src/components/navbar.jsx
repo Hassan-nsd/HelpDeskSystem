@@ -8,10 +8,11 @@ import {
   FaUsers,
   FaCog,
   FaSignOutAlt,
+  FaBars,
 } from "react-icons/fa";
 import "../styles/navbar.css";
 
-function NavBar({ isOpen }) {
+function NavBar({ isOpen, toggleSidebar }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -34,10 +35,11 @@ function NavBar({ isOpen }) {
   }
 
   return (
-    <aside className={`sidebar ${isOpen ? "open" : ""}`}>
+    <aside className={`sidebar ${isOpen ? "openSidebar" : ""}`}>
       <div className="logo">
         <h2>IT Help Desk</h2>
         <span>Ticketing System</span>
+        <FaBars className="menu-btn" onClick={toggleSidebar} />
       </div>
 
       <nav>

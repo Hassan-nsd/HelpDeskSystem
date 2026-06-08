@@ -59,6 +59,9 @@ td {
 .low {
   background: #10b981;
 }
+.critical{
+  background: #B91C1C;
+}
 
 .table-card {
   background: #07133d;

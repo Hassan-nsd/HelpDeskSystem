@@ -107,7 +107,7 @@ namespace HelpDesk.API.Controllers
                     UpdatedAt = DateTime.UtcNow,
 
                     ReferenceNumber =
-                       $"TKT-{Guid.NewGuid().ToString()[..8]}"
+                       $"TKT-{Guid.NewGuid().ToString()[..4]}"
                };
 
                _context.Tickets.Add(ticket);
