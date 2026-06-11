@@ -18,6 +18,8 @@
 
         public string CreatedBy { get; set; } = "";
 
+        public DateTime CreatedAt { get; set; }
+
         public string? AssignedTo { get; set; }
 
         public DateTime UpdatedAt { get; set; }

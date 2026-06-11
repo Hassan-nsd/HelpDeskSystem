@@ -1,5 +1,6 @@
 table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
 }
 
@@ -60,8 +61,8 @@ td {
 .low {
   background: #10b981;
 }
-.critical{
-  background: #B91C1C;
+.critical {
+  background: #b91c1c;
 }
 
 .table-card h3 {

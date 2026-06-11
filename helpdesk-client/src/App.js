@@ -21,7 +21,7 @@ function App() {
 
         <Route path="/createTicket" element={<CreateTicket />} />
 
-        <Route path="/ticketDetails" element={<TicketDetails />} />
+        <Route path="/tickets/:id" element={<TicketDetails />} />
       </Routes>
     </BrowserRouter>
   );

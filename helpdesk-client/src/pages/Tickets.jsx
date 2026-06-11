@@ -11,6 +11,12 @@ function Tickets() {
   const [tickets, setTickets] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const assignedTickets = tickets.filter((t) => t.assignedTo !== null);
+
+  const unassignedTickets = tickets.filter((t) => t.assignedTo === null);
+
+  const isAdminOrManager = localStorage.roleId == 1 || localStorage.roleId == 4;
+
   useEffect(() => {
     loadTickets();
 
@@ -30,10 +36,10 @@ function Tickets() {
   };
 
   function roleName() {
-    if (localStorage.roleId == 1) return "Admin";
-    if (localStorage.roleId == 2) return "Employee";
-    if (localStorage.roleId == 3) return "Support Agent";
-    if (localStorage.roleId == 4) return "Manager";
+    if (localStorage.roleId === 1) return "Admin";
+    if (localStorage.roleId === 2) return "Employee";
+    if (localStorage.roleId === 3) return "Support Agent";
+    if (localStorage.roleId === 4) return "Manager";
   }
   const getStatusClass = (status) => {
     switch (status?.toLowerCase()) {
@@ -92,7 +98,11 @@ function Tickets() {
 
             <tbody>
               {tickets.map((ticket) => (
-                <tr key={ticket.id}>
+                <tr
+                  key={ticket.id}
+                  onClick={() => navigate(`/tickets/${ticket.id}`)}
+                  style={{ cursor: "pointer" }}
+                >
                   <td>{ticket.referenceNumber}</td>
                   <td>{ticket.title}</td>
                   <td>
@@ -112,6 +122,51 @@ function Tickets() {
             </tbody>
           </table>
         </div>
+
+        {isAdminOrManager && (
+          <>
+            <h2 className="page-title">Unassigned Tickets </h2>
+            <div className="table-card">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ref</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {unassignedTickets.map((ticket) => (
+                    <tr
+                      key={ticket.id}
+                      onClick={() => navigate(`/tickets/${ticket.id}`)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <td>{ticket.referenceNumber}</td>
+                      <td>{ticket.title}</td>
+                      <td>
+                        <span
+                          className={`status ${getStatusClass(ticket.status)}`}
+                        >
+                          {ticket.status}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={`priority ${getPriorityClass(ticket.priority)}`}
+                        >
+                          {ticket.priority}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </main>
     </div>
   );
