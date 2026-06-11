@@ -72,18 +72,16 @@ function TicketDetails() {
   };
 
   const loadAssignableUsers = async () => {
-    if (ticket?.assignedTo === null) {
-      try {
-        const data = await getAssignableUsers();
+    try {
+      const data = await getAssignableUsers();
 
-        setAssignableUsers(data);
+      setAssignableUsers(data);
 
-        if (data.length > 0) {
-          setSelectedUser(data[0].id);
-        }
-      } catch (error) {
-        console.error(error);
+      if (data.length > 0) {
+        setSelectedUser(data[0].id);
       }
+    } catch (error) {
+      console.error(error);
     }
   };
   const handleAssign = async () => {
@@ -163,16 +161,11 @@ function TicketDetails() {
                 {ticket?.assignedTo ? (
                   <span className="detail-value">{ticket.assignedTo}</span>
                 ) : canAssign ? (
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "10px",
-                      alignItems: "center",
-                    }}
-                  >
+                  <div className="assign-container">
                     <select
                       value={selectedUser}
                       onChange={(e) => setSelectedUser(e.target.value)}
+                      className="assign-select"
                     >
                       {assignableUsers.map((user) => (
                         <option key={user.id} value={user.id}>
@@ -186,7 +179,7 @@ function TicketDetails() {
                       ))}
                     </select>
 
-                    <button className="send-btn" onClick={handleAssign}>
+                    <button className="assign-btn" onClick={handleAssign}>
                       Assign
                     </button>
                   </div>

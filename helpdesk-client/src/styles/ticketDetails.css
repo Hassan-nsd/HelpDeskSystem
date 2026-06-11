@@ -269,6 +269,55 @@
   background: #1f56df;
 }
 
+.assign-select {
+  min-width: 260px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #2d3748;
+  background: #1a202c;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.assign-select:hover {
+  border-color: #4f46e5;
+}
+
+.assign-select:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+}
+
+.assign-select option {
+  background: #1a202c;
+  color: #fff;
+}
+
+.assign-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.assign-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #4f46e5;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.assign-btn:hover {
+  transform: translateY(-1px);
+  background: #4338ca;
+}
+
 @media (max-width: 1200px) {
   .ticket-content {
     grid-template-columns: 1fr;
