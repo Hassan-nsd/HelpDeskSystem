@@ -1,82 +1,110 @@
 import NavBar from "../components/navbar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "../styles/Dashboard.css";
 import "../styles/ticketDetails.css";
-import { FaArrowLeft, FaDownload, FaFileAlt } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import {
+  FaArrowLeft,
+  FaDownload,
+  FaFileAlt,
+  FaTrash,
+  FaEdit,
+} from "react-icons/fa";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   getTicketById,
   getAssignableUsers,
   assignTicket,
+  getComments,
+  addComment,
+  deleteComment,
+  updateComment,
+  updateTicketStatus,
 } from "../services/api";
 
 const getStatusClass = (status) => {
-  switch (status?.toLowerCase()) {
-    case "open":
-      return "status-open";
-    case "in progress":
-      return "status-progress";
-    case "pending":
-      return "status-pending";
-    case "resolved":
-      return "status-resolved";
-    case "closed":
-      return "status-closed";
-    default:
-      return "";
-  }
+  const statusClasses = {
+    open: "status-open",
+    "in progress": "status-progress",
+    pending: "status-pending",
+    resolved: "status-resolved",
+    closed: "status-closed",
+  };
+  return statusClasses[status?.toLowerCase()] || "";
 };
 
 const getPriorityClass = (priority) => {
-  switch (priority?.toLowerCase()) {
-    case "high":
-      return "priority-high ";
-    case "medium":
-      return "priority-medium";
-    case "low":
-      return "priority-low";
-    case "critical":
-      return "priority-critical";
-    default:
-      return "";
-  }
+  const priorityClasses = {
+    high: "priority-high",
+    medium: "priority-medium",
+    low: "priority-low",
+    critical: "priority-critical",
+  };
+  return priorityClasses[priority?.toLowerCase()] || "";
 };
 
-const canAssign = localStorage.roleId == 1 || localStorage.roleId == 4;
+const canAssign =
+  localStorage.getItem("roleId") === "1" ||
+  localStorage.getItem("roleId") === "4";
 
 function TicketDetails() {
   const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { id } = useParams();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [ticket, setTicket] = useState(null);
   const [assignableUsers, setAssignableUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState("");
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editedComment, setEditedComment] = useState("");
+  const currentUserId = Number(localStorage.getItem("userId") || 0);
+  const roleId = Number(localStorage.getItem("roleId"));
+  const isAdmin = roleId === 1;
+  const isManager = roleId === 4;
+  const isSupportAgent = roleId === 3;
+  const [selectedStatus, setSelectedStatus] = useState("");
 
-  useEffect(() => {
-    loadTicket();
-
-    if (canAssign) {
-      loadAssignableUsers();
+  const allowedStatuses = () => {
+    if (isAdmin || isManager) {
+      return ["in progress", "pending", "resolved", "closed"];
     }
-  }, [id]);
+    if (isSupportAgent) {
+      return ["in progress", "pending", "resolved"];
+    }
+    return [];
+  };
 
-  const loadTicket = async () => {
+  const loadTicket = useCallback(async () => {
     try {
       const data = await getTicketById(id);
-      console.log(data);
       setTicket(data);
+      setSelectedStatus("");
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [id]);
+
+  const loadComments = useCallback(async () => {
+    try {
+      const data = await getComments(id);
+      setComments(data);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    loadTicket();
+    loadComments();
+    if (canAssign) {
+      loadAssignableUsers();
+    }
+  }, [id, loadTicket, loadComments]);
 
   const loadAssignableUsers = async () => {
     try {
       const data = await getAssignableUsers();
-
       setAssignableUsers(data);
-
       if (data.length > 0) {
         setSelectedUser(data[0].id);
       }
@@ -84,13 +112,70 @@ function TicketDetails() {
       console.error(error);
     }
   };
+
   const handleAssign = async () => {
     try {
       await assignTicket(ticket.id, selectedUser);
-
       await loadTicket();
-
       alert("Ticket assigned successfully");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
+
+    try {
+      await addComment(ticket.id, newComment);
+      setNewComment("");
+      await loadComments();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this comment?",
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      await deleteComment(commentId);
+      await loadComments();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleEditComment = (comment) => {
+    setEditingCommentId(comment.id);
+    setEditedComment(comment.comment);
+  };
+
+  const handleSaveEdit = async (commentId) => {
+    try {
+      await updateComment(commentId, editedComment);
+      setEditingCommentId(null);
+      setEditedComment("");
+      await loadComments();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCommentId(null);
+    setEditedComment("");
+  };
+
+  // New function to update the status when the button is clicked
+  const handleUpdateStatus = async () => {
+    try {
+      await updateTicketStatus(ticket.id, selectedStatus); // Call the API to update status
+      alert("Status updated successfully");
     } catch (error) {
       console.error(error);
     }
@@ -126,21 +211,16 @@ function TicketDetails() {
             <div className="ticket-details-grid">
               <div className="detail-row">
                 <span className="detail-label">Ticket ID</span>
-                <span className={`detail-value }`}>
-                  {ticket?.referenceNumber}
-                </span>
+                <span className="detail-value">{ticket?.referenceNumber}</span>
               </div>
-
               <div className="detail-row">
                 <span className="detail-label">Title</span>
                 <span className="detail-value">{ticket?.title}</span>
               </div>
-
               <div className="detail-row">
                 <span className="detail-label">Category</span>
-                <span className="detail-value"> {ticket?.category}</span>
+                <span className="detail-value">{ticket?.category}</span>
               </div>
-
               <div className="detail-row">
                 <span className="detail-label">Priority</span>
                 <span
@@ -149,15 +229,12 @@ function TicketDetails() {
                   {ticket?.priority}
                 </span>
               </div>
-
               <div className="detail-row">
-                <span className="detail-label">CreatedBy</span>
+                <span className="detail-label">Created By</span>
                 <span className="detail-value">{ticket?.createdBy}</span>
               </div>
-
               <div className="detail-row">
                 <span className="detail-label">Assigned To</span>
-
                 {ticket?.assignedTo ? (
                   <span className="detail-value">{ticket.assignedTo}</span>
                 ) : canAssign ? (
@@ -169,16 +246,11 @@ function TicketDetails() {
                     >
                       {assignableUsers.map((user) => (
                         <option key={user.id} value={user.id}>
-                          {user.fullName}
-                          {" - "}
-                          {user.role}
-                          {" ("}
-                          {user.assignedTicketsCount}
-                          {" tickets)"}
+                          {user.fullName} - {user.role} (
+                          {user.assignedTicketsCount} tickets)
                         </option>
                       ))}
                     </select>
-
                     <button className="assign-btn" onClick={handleAssign}>
                       Assign
                     </button>
@@ -191,6 +263,35 @@ function TicketDetails() {
                 <span className="detail-label">Created At</span>
                 <span className="detail-value">{ticket?.createdAt}</span>
               </div>
+              <div className="detail-row">
+                <span className="detail-label">Status</span>
+                {isAdmin || isManager || isSupportAgent ? (
+                  <div className="assign-container">
+                    <select
+                      value={selectedStatus}
+                      onChange={(e) => setSelectedStatus(e.target.value)}
+                      className="assign-select"
+                    >
+                      <option value="" disabled>
+                        Change Status
+                      </option>
+                      {allowedStatuses().map((status) => (
+                        <option key={status} value={status}>
+                          {status.charAt(0).toUpperCase() + status.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      className="status-update-btn"
+                      onClick={handleUpdateStatus}
+                    >
+                      Update Status
+                    </button>
+                  </div>
+                ) : (
+                  <span className="detail-value">{ticket.status}</span>
+                )}
+              </div>
             </div>
 
             <div className="ticket-description">
@@ -200,13 +301,11 @@ function TicketDetails() {
 
             <div className="attachment-section">
               <h4>Attachment</h4>
-
               <div className="attachment-box">
                 <div className="attachment-file">
                   <FaFileAlt />
                   <span>vpn_error_screenshot.png (2.4 MB)</span>
                 </div>
-
                 <FaDownload className="download-btn" />
               </div>
             </div>
@@ -217,59 +316,92 @@ function TicketDetails() {
             <h2>Comments</h2>
 
             <div className="comments-list">
-              <div className="comment">
-                <div className="avatar">J</div>
+              {comments.length === 0 ? (
+                <p className="no-comments">No comments yet.</p>
+              ) : (
+                comments.map((comment) => {
+                  const isOwner = currentUserId === parseInt(comment.userId);
+                  const canDeleteComment = isOwner || isAdmin || isManager;
 
-                <div className="comment-body">
-                  <div className="comment-header">
-                    <strong>John Smith</strong>
-                    <span>May 21, 10:35 AM</span>
-                  </div>
+                  return (
+                    <div className="comment" key={comment.id}>
+                      <div className="avatar">
+                        {comment.userName?.charAt(0).toUpperCase()}
+                      </div>
 
-                  <p>
-                    I cannot access the VPN. It keeps showing connection failed
-                    even after restarting my laptop.
-                  </p>
-                </div>
-              </div>
+                      <div className="comment-body">
+                        <div className="comment-header">
+                          <strong className="comment-user">
+                            {comment.userName}
+                          </strong>
+                          <span className="comment-date">
+                            {new Date(comment.createdAt).toLocaleString()}
+                          </span>
+                        </div>
 
-              <div className="comment">
-                <div className="avatar agent">S</div>
-
-                <div className="comment-body">
-                  <div className="comment-header">
-                    <strong>Sarah Johnson</strong>
-                    <span>May 21, 10:45 AM</span>
-                  </div>
-
-                  <p>
-                    Thank you for reporting the issue. We are currently
-                    reviewing your VPN configuration.
-                  </p>
-                </div>
-              </div>
-
-              <div className="comment">
-                <div className="avatar">J</div>
-
-                <div className="comment-body">
-                  <div className="comment-header">
-                    <strong>John Smith</strong>
-                    <span>May 21, 11:10 AM</span>
-                  </div>
-
-                  <p>
-                    Thank you. Please let me know if you need any additional
-                    information.
-                  </p>
-                </div>
-              </div>
+                        {editingCommentId === comment.id ? (
+                          <div className="edit-comment-container">
+                            <textarea
+                              value={editedComment}
+                              onChange={(e) => setEditedComment(e.target.value)}
+                              className="edit-comment-textarea"
+                            />
+                            <div className="edit-actions">
+                              <button
+                                className="save-edit-btn"
+                                onClick={() => handleSaveEdit(comment.id)}
+                              >
+                                Save
+                              </button>
+                              <button
+                                className="cancel-edit-btn"
+                                onClick={handleCancelEdit}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="comment-content">
+                            <p className="comment-text">{comment.comment}</p>
+                            <div className="comment-buttons">
+                              {isOwner && (
+                                <button
+                                  className="comment-icon-btn edit-btn"
+                                  onClick={() => handleEditComment(comment)}
+                                >
+                                  <FaEdit />
+                                </button>
+                              )}
+                              {canDeleteComment && (
+                                <button
+                                  className="comment-icon-btn delete-btn"
+                                  onClick={() =>
+                                    handleDeleteComment(comment.id)
+                                  }
+                                >
+                                  <FaTrash />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
 
             <div className="comment-input">
-              <textarea placeholder="Write a comment..."></textarea>
-
-              <button className="send-btn">Add Comment</button>
+              <textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Write a comment..."
+              />
+              <button className="send-btn" onClick={handleAddComment}>
+                Add Comment
+              </button>
             </div>
           </div>
         </div>

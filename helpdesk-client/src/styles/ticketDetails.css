@@ -204,14 +204,41 @@
   flex: 1;
   background: rgba(255, 255, 255, 0.04);
   border-radius: 14px;
-  padding: 14px 16px;
+  padding: 16px 18px;
 }
 
 .comment-header {
   display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.comment-user {
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.comment-date {
+  margin-left: auto;
+  color: #8c98b3;
+  font-size: 13px;
+  letter-spacing: 0.2px;
+}
+
+.comment-content {
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  gap: 16px;
+}
+
+.comment-text {
+  flex: 1;
+  margin: 0;
+  color: #d6dcff;
+  line-height: 1.6;
+  word-break: break-word;
 }
 
 .comment-header strong {
@@ -271,7 +298,7 @@
 
 .assign-select {
   min-width: 260px;
-  padding: 10px 14px;
+  padding: 10px;
   border-radius: 8px;
   border: 1px solid #2d3748;
   background: #1a202c;
@@ -306,7 +333,7 @@
   padding: 10px 18px;
   border: none;
   border-radius: 8px;
-  background: #4f46e5;
+  background: #2463ff;
   color: white;
   font-weight: 600;
   cursor: pointer;
@@ -317,6 +344,130 @@
   transform: translateY(-1px);
   background: #4338ca;
 }
+
+.delete-comment-btn {
+  border: none;
+  background: transparent;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin-left: 10px;
+}
+
+.delete-comment-btn:hover {
+  text-decoration: underline;
+}
+
+.comment-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.comment-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.comment-icon-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #8c98b3;
+  font-size: 15px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.comment-icon-btn:hover {
+  transform: scale(1.15);
+}
+
+.edit-btn:hover {
+  color: #c4cffd;
+}
+
+.delete-btn:hover {
+  color: #ff7b7b;
+}
+
+.edit-comment-container {
+  margin-top: 8px;
+}
+
+.edit-comment-textarea {
+  width: 100%;
+  min-height: 90px;
+  resize: vertical;
+  background: #081742;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 12px;
+  color: white;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.edit-comment-textarea:focus {
+  border-color: #2463ff;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.save-edit-btn,
+.cancel-edit-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.save-edit-btn {
+  background: #2563eb;
+  color: white;
+}
+
+.save-edit-btn:hover {
+  background: #1d4ed8;
+}
+
+.cancel-edit-btn {
+  background: #374151;
+  color: white;
+}
+
+.cancel-edit-btn:hover {
+  background: #4b5563;
+}
+
+.status-update-btn {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #2463ff;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.status-update-btn:hover {
+  transform: translateY(-1px);
+  background: #4338ca;
+}
+
 
 @media (max-width: 1200px) {
   .ticket-content {

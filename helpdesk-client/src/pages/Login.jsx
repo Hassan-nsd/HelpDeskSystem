@@ -33,10 +33,13 @@ function Login() {
         data = { message: text };
       }
 
+      console.log("Login response:", data); //
+
       if (response.ok) {
         localStorage.setItem("token", data?.token);
         localStorage.setItem("roleId", data?.user?.roleId);
         localStorage.setItem("fullName", data?.user?.fullName);
+        localStorage.setItem("userId", data?.user?.id);
 
         const roleId = data?.user?.roleId;
 
@@ -108,7 +111,9 @@ function Login() {
               <a href="/">Forgot password?</a>
             </div>
 
-            <button className="login-btn" type="submit">Sign In</button>
+            <button className="login-btn" type="submit">
+              Sign In
+            </button>
 
             <div className="footer-text">
               Don’t have an account?

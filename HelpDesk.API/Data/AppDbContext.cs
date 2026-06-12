@@ -21,5 +21,7 @@ namespace HelpDesk.API.Data
         public DbSet<Priority> Priorities => Set<Priority>();
 
         public DbSet<Status> Statuses => Set<Status>();
-    }
+
+        public DbSet<TicketComment> TicketComments { get; set; }
+     }
 }
