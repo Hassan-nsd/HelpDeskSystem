@@ -8,6 +8,7 @@ import {
   FaFileAlt,
   FaTrash,
   FaEdit,
+  FaRegFileAlt,
 } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -19,6 +20,8 @@ import {
   deleteComment,
   updateComment,
   updateTicketStatus,
+  getAttachments,
+  uploadAttachment,
 } from "../services/api";
 
 const getStatusClass = (status) => {
@@ -42,6 +45,25 @@ const getPriorityClass = (priority) => {
   return priorityClasses[priority?.toLowerCase()] || "";
 };
 
+const getNextStatuses = (currentStatus) => {
+  switch (currentStatus?.toLowerCase()) {
+    case "open":
+      return ["in progress"];
+
+    case "in progress":
+      return ["resolved", "pending"];
+
+    case "resolved":
+      return ["in progress", "closed"];
+
+    case "pending":
+      return ["in progress"];
+
+    default:
+      return [];
+  }
+};
+
 const canAssign =
   localStorage.getItem("roleId") === "1" ||
   localStorage.getItem("roleId") === "4";
@@ -63,6 +85,8 @@ function TicketDetails() {
   const isManager = roleId === 4;
   const isSupportAgent = roleId === 3;
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [attachments, setAttachments] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const allowedStatuses = () => {
     if (isAdmin || isManager) {
@@ -78,7 +102,7 @@ function TicketDetails() {
     try {
       const data = await getTicketById(id);
       setTicket(data);
-      setSelectedStatus("");
+      setSelectedStatus(data.status);
     } catch (error) {
       console.error(error);
     }
@@ -96,6 +120,7 @@ function TicketDetails() {
   useEffect(() => {
     loadTicket();
     loadComments();
+    loadAttachments();
     if (canAssign) {
       loadAssignableUsers();
     }
@@ -108,6 +133,15 @@ function TicketDetails() {
       if (data.length > 0) {
         setSelectedUser(data[0].id);
       }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const loadAttachments = async () => {
+    try {
+      const data = await getAttachments(id);
+      setAttachments(data);
     } catch (error) {
       console.error(error);
     }
@@ -171,11 +205,28 @@ function TicketDetails() {
     setEditedComment("");
   };
 
-  // New function to update the status when the button is clicked
   const handleUpdateStatus = async () => {
     try {
-      await updateTicketStatus(ticket.id, selectedStatus); // Call the API to update status
+      await updateTicketStatus(ticket.id, selectedStatus);
+      await loadTicket();
       alert("Status updated successfully");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleUploadAttachment = async () => {
+    if (!selectedFile) {
+      alert("Please select a file");
+      return;
+    }
+
+    try {
+      await uploadAttachment(ticket.id, selectedFile);
+
+      setSelectedFile(null);
+
+      await loadAttachments();
     } catch (error) {
       console.error(error);
     }
@@ -199,13 +250,45 @@ function TicketDetails() {
         </button>
 
         <div className="ticket-content">
-          {/* Ticket Details */}
           <div className="details-card">
             <div className="card-header">
               <h2>Ticket Details</h2>
-              <span className={`status-badge ${getStatusClass(ticket.status)}`}>
-                {ticket.status}
-              </span>
+              {isAdmin || isManager || isSupportAgent ? (
+                <div className="status-dropdown-container">
+                  <select
+                    value={ticket.status}
+                    onChange={async (e) => {
+                      const newStatus = e.target.value;
+
+                      try {
+                        await updateTicketStatus(ticket.id, newStatus);
+                        await loadTicket();
+                      } catch (error) {
+                        console.error(error);
+                      }
+                    }}
+                    className={`status-select ${getStatusClass(ticket.status)}`}
+                  >
+                    <option value={ticket.status}>{ticket.status}</option>
+
+                    {getNextStatuses(ticket.status).map((status) => (
+                      <option
+                        key={status}
+                        value={status}
+                        className={`status-select ${getStatusClass(status)}`}
+                      >
+                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <span
+                  className={`status-badge ${getStatusClass(ticket.status)}`}
+                >
+                  {ticket.status}
+                </span>
+              )}
             </div>
 
             <div className="ticket-details-grid">
@@ -263,35 +346,6 @@ function TicketDetails() {
                 <span className="detail-label">Created At</span>
                 <span className="detail-value">{ticket?.createdAt}</span>
               </div>
-              <div className="detail-row">
-                <span className="detail-label">Status</span>
-                {isAdmin || isManager || isSupportAgent ? (
-                  <div className="assign-container">
-                    <select
-                      value={selectedStatus}
-                      onChange={(e) => setSelectedStatus(e.target.value)}
-                      className="assign-select"
-                    >
-                      <option value="" disabled>
-                        Change Status
-                      </option>
-                      {allowedStatuses().map((status) => (
-                        <option key={status} value={status}>
-                          {status.charAt(0).toUpperCase() + status.slice(1)}
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      className="status-update-btn"
-                      onClick={handleUpdateStatus}
-                    >
-                      Update Status
-                    </button>
-                  </div>
-                ) : (
-                  <span className="detail-value">{ticket.status}</span>
-                )}
-              </div>
             </div>
 
             <div className="ticket-description">
@@ -300,18 +354,49 @@ function TicketDetails() {
             </div>
 
             <div className="attachment-section">
-              <h4>Attachment</h4>
-              <div className="attachment-box">
-                <div className="attachment-file">
-                  <FaFileAlt />
-                  <span>vpn_error_screenshot.png (2.4 MB)</span>
-                </div>
-                <FaDownload className="download-btn" />
+              <h4>Attachments</h4>
+
+              <div className="upload-container">
+                <label className="file-picker">
+                  <FaRegFileAlt />
+                  <span>{selectedFile ? selectedFile.name : ""}</span>
+
+                  <input
+                    type="file"
+                    hidden
+                    onChange={(e) => setSelectedFile(e.target.files[0])}
+                  />
+                </label>
+
+                <button className="assign-btn" onClick={handleUploadAttachment}>
+                  Upload
+                </button>
               </div>
+
+              {attachments.length === 0 ? (
+                <p>No attachments found.</p>
+              ) : (
+                attachments.map((attachment) => (
+                  <div key={attachment.id} className="attachment-box">
+                    <div className="attachment-file">
+                      <FaFileAlt />
+                      <span>{attachment.fileName}</span>
+                    </div>
+
+                    <a
+                      href={`http://localhost:5213${attachment.filePath}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      download={attachment.fileName}
+                    >
+                      <FaDownload className="download-btn" />
+                    </a>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
-          {/* Comments */}
           <div className="comments-card">
             <h2>Comments</h2>
 

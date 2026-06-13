@@ -179,3 +179,35 @@ export const updateTicketStatus = async (ticketId, status) => {
 
   return await response.json();
 };
+
+export const getAttachments = async (ticketId) => {
+  const response = await fetch(
+    `http://localhost:5213/api/attachments/ticket/${ticketId}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to load attachments");
+  }
+
+  return await response.json();
+};
+
+export const uploadAttachment = async (ticketId, file) => {
+  const formData = new FormData();
+
+  formData.append("file", file);
+
+  const response = await fetch(
+    `http://localhost:5213/api/attachments/${ticketId}`,
+    {
+      method: "POST",
+      body: formData,
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to upload attachment");
+  }
+
+  return await response.json();
+};

@@ -23,5 +23,7 @@ namespace HelpDesk.API.Data
         public DbSet<Status> Statuses => Set<Status>();
 
         public DbSet<TicketComment> TicketComments { get; set; }
-     }
+
+        public DbSet<TicketAttachment> TicketAttachments { get; set; }
+    }
 }
