@@ -18,43 +18,43 @@ public class ReportsController : ControllerBase
      [HttpGet]
      public async Task<IActionResult> GetReportData()
      {
-          var totalTickets = _context.Tickets.Count();
+          var totalTickets = await _context.Tickets.CountAsync();
 
-          var openTickets = _context.Tickets
-              .Count(t => t.Status.Name == "Open");
+          var openTickets = await _context.Tickets
+              .CountAsync(t => t.Status != null && t.Status.Name == "Open");
 
-          var inProgressTickets = _context.Tickets
-              .Count(t => t.Status.Name == "In Progress");
+          var inProgressTickets = await _context.Tickets
+              .CountAsync(t => t.Status != null && t.Status.Name == "In Progress");
 
-          var pendingTickets = _context.Tickets
-              .Count(t => t.Status.Name == "Pending");
+          var pendingTickets = await _context.Tickets
+              .CountAsync(t => t.Status != null && t.Status.Name == "Pending");
 
-          var resolvedTickets = _context.Tickets
-              .Count(t => t.Status.Name == "Resolved");
+          var resolvedTickets = await _context.Tickets
+              .CountAsync(t => t.Status != null && t.Status.Name == "Resolved");
 
-          var closedTickets = _context.Tickets
-              .Count(t => t.Status.Name == "Closed");
+          var closedTickets = await _context.Tickets
+              .CountAsync(t => t.Status != null && t.Status.Name == "Closed");
 
-          var supportAgentsOnline = _context.Users
-            .Count(u => u.RoleId == 3);
+          var supportAgentsOnline = await _context.Users
+              .CountAsync(u => u.RoleId == 3);
 
-          var lowTickets = _context.Tickets
-             .Count(t => t.Priority.Name == "Low");
+          var lowTickets = await _context.Tickets
+              .CountAsync(t => t.Priority != null && t.Priority.Name == "Low");
 
-          var mediumTickets = _context.Tickets
-              .Count(t => t.Priority.Name == "Medium");
+          var mediumTickets = await _context.Tickets
+              .CountAsync(t => t.Priority != null && t.Priority.Name == "Medium");
 
-          var highTickets = _context.Tickets
-              .Count(t => t.Priority.Name == "High");
+          var highTickets = await _context.Tickets
+              .CountAsync(t => t.Priority != null && t.Priority.Name == "High");
 
-          var criticalTickets = _context.Tickets
-              .Count(t => t.Priority.Name == "Critical");
+          var criticalTickets = await _context.Tickets
+              .CountAsync(t => t.Priority != null && t.Priority.Name == "Critical");
 
-          var assignedTickets = _context.Tickets
-               .Count(t => t.AssignedTo != null);
+          var assignedTickets = await _context.Tickets
+              .CountAsync(t => t.AssignedTo != null);
 
-          var unassignedTickets = _context.Tickets
-               .Count(t => t.AssignedTo == null);
+          var unassignedTickets = await _context.Tickets
+              .CountAsync(t => t.AssignedTo == null);
 
           return Ok(new
           {

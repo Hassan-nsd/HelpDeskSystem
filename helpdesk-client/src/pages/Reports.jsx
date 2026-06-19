@@ -7,8 +7,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -181,46 +179,48 @@ function Reports() {
           <div className="report-panel">
             <h3>Assignment Overview</h3>
 
-            <div className="assignment-chart">
-              <PieChart width={450} height={300}>
-                <Pie
-                  data={assignmentData}
-                  dataKey="value"
-                  innerRadius={60}
-                  outerRadius={95}
-                >
-                  <Cell fill="#2563eb" />
-                  <Cell fill="#ef4444" />
-                </Pie>
-              </PieChart>
-            </div>
+            <div className="pie-container">
+              <div className="assignment-chart">
+                <PieChart width={350} height={280}>
+                  <Pie
+                    data={assignmentData}
+                    dataKey="value"
+                    innerRadius={60}
+                    outerRadius={95}
+                  >
+                    <Cell fill="#2563eb" />
+                    <Cell fill="#ef4444" />
+                  </Pie>
+                </PieChart>
+              </div>
 
-            <div className="pie-legend">
-              {assignmentData.map((item, index) => {
-                const total =
-                  (report?.assignedTickets ?? 0) +
-                  (report?.unassignedTickets ?? 0);
+              <div className="pie-legend">
+                {assignmentData.map((item, index) => {
+                  const total =
+                    (report?.assignedTickets ?? 0) +
+                    (report?.unassignedTickets ?? 0);
 
-                const percentage =
-                  total > 0 ? ((item.value / total) * 100).toFixed(1) : 0;
+                  const percentage =
+                    total > 0 ? ((item.value / total) * 100).toFixed(1) : 0;
 
-                return (
-                  <div key={index} className="legend-item">
-                    <span
-                      className="legend-color"
-                      style={{
-                        backgroundColor: index === 0 ? "#2563eb" : "#ef4444",
-                      }}
-                    />
+                  return (
+                    <div key={index} className="legend-item">
+                      <span
+                        className="legend-color"
+                        style={{
+                          backgroundColor: index === 0 ? "#2563eb" : "#ef4444",
+                        }}
+                      />
 
-                    <span>{item.name}</span>
+                      <span>{item.name}</span>
 
-                    <strong>
-                      {item.value} ({percentage}%)
-                    </strong>
-                  </div>
-                );
-              })}
+                      <strong>
+                        {item.value} ({percentage}%)
+                      </strong>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
