@@ -18,7 +18,6 @@ function CreateTicket() {
   const [priorities, setPriorities] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-
   useEffect(() => {
     loadDropdowns();
   }, []);
@@ -75,8 +74,6 @@ function CreateTicket() {
       });
 
       if (response.ok) {
-        alert("Ticket created successfully");
-
         setTicket({
           title: "",
           description: "",
@@ -92,7 +89,10 @@ function CreateTicket() {
   return (
     <>
       <div className="dashboard-container">
-        <NavBar isOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+        <NavBar
+          isOpen={sidebarOpen}
+          toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        />
         <main className="main-content">
           <TopBar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
           <div className="create-ticket-page">

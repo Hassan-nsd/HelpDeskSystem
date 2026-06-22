@@ -151,7 +151,6 @@ function TicketDetails() {
     try {
       await assignTicket(ticket.id, selectedUser);
       await loadTicket();
-      alert("Ticket assigned successfully");
     } catch (error) {
       console.error(error);
     }
@@ -209,7 +208,6 @@ function TicketDetails() {
     try {
       await updateTicketStatus(ticket.id, selectedStatus);
       await loadTicket();
-      alert("Status updated successfully");
     } catch (error) {
       console.error(error);
     }

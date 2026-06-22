@@ -3,7 +3,6 @@ import {
   FaHome,
   FaPlusSquare,
   FaTicketAlt,
-  FaBook,
   FaChartBar,
   FaUsers,
   FaCog,

@@ -76,6 +76,42 @@ function Reports() {
     },
   ];
 
+  const categoryData = [
+    {
+      name: "Email",
+      value: report?.emailCat ?? 0,
+    },
+    {
+      name: "Access Request",
+      value: report?.accReCat ?? 0,
+    },
+    {
+      name: "Hardware",
+      value: report?.hardwareCat ?? 0,
+    },
+    {
+      name: "Network",
+      value: report?.networkCat ?? 0,
+    },
+    {
+      name: "Software",
+      value: report?.softwareCat ?? 0,
+    },
+    {
+      name: "Other",
+      value: report?.otherCat ?? 0,
+    },
+  ];
+
+  const CATEGORY_COLORS = [
+    "#06B6D4", // Email - Cyan
+    "#A855F7", // Access Request - Violet
+    "#F97316", // Hardware - Orange
+    "#22C55E", // Network - Green
+    "#EC4899", // Software - Pink
+    "#94A3B8", // Other - Light Slate
+  ];
+
   return (
     <div className="dashboard-container">
       <NavBar
@@ -95,13 +131,13 @@ function Reports() {
           </div>
 
           <div className="report-card">
-            <h1>4.6 hrs</h1>
-            <p>Avg Resolution Time</p>
+            <h1>{report?.assignedTickets ?? 0}</h1>
+            <p>Assigned Tickets</p>
           </div>
 
           <div className="report-card">
-            <h1>{report?.openTickets ?? 0}</h1>
-            <p>Open Tickets</p>
+            <h1>{report?.unassignedTickets ?? 0}</h1>
+            <p>Unassigned Tickets</p>
           </div>
 
           <div className="report-card">
@@ -183,22 +219,27 @@ function Reports() {
               <div className="assignment-chart">
                 <PieChart width={350} height={280}>
                   <Pie
-                    data={assignmentData}
+                    data={categoryData}
                     dataKey="value"
                     innerRadius={60}
                     outerRadius={95}
                   >
-                    <Cell fill="#2563eb" />
-                    <Cell fill="#ef4444" />
+                    {categoryData.map((entry, index) => (
+                      <Cell key={index} fill={CATEGORY_COLORS[index]} />
+                    ))}
                   </Pie>
                 </PieChart>
               </div>
 
               <div className="pie-legend">
-                {assignmentData.map((item, index) => {
+                {categoryData.map((item, index) => {
                   const total =
-                    (report?.assignedTickets ?? 0) +
-                    (report?.unassignedTickets ?? 0);
+                    (report?.emailCat ?? 0) +
+                    (report?.softwareCat ?? 0) +
+                    (report?.hardwareCat ?? 0) +
+                    (report?.accReCat ?? 0) +
+                    (report?.networkCat ?? 0) +
+                    (report?.otherCat ?? 0);
 
                   const percentage =
                     total > 0 ? ((item.value / total) * 100).toFixed(1) : 0;
@@ -208,7 +249,7 @@ function Reports() {
                       <span
                         className="legend-color"
                         style={{
-                          backgroundColor: index === 0 ? "#2563eb" : "#ef4444",
+                          backgroundColor: CATEGORY_COLORS[index],
                         }}
                       />
 

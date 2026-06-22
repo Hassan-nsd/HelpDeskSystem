@@ -56,7 +56,25 @@ public class ReportsController : ControllerBase
           var unassignedTickets = await _context.Tickets
               .CountAsync(t => t.AssignedTo == null);
 
-          return Ok(new
+          var emailCat = await _context.Tickets
+              .CountAsync(t => t.Category!= null && t.Category.Name == "Email");
+
+          var accReCat = await _context.Tickets
+              .CountAsync(t => t.Category != null && t.Category.Name == "Access Request");
+
+         var  hardwareCat = await _context.Tickets
+              .CountAsync(t => t.Category != null && t.Category.Name == "Hardware");
+
+         var networkCat = await _context.Tickets
+              .CountAsync(t => t.Category != null && t.Category.Name == "Network");
+
+         var softwareCat = await _context.Tickets
+              .CountAsync(t => t.Category != null && t.Category.Name == "Software");
+
+         var otherCat = await _context.Tickets
+              .CountAsync(t => t.Category != null && t.Category.Name == "Other");
+
+        return Ok(new
           {
                totalTickets,
                openTickets,
@@ -70,7 +88,14 @@ public class ReportsController : ControllerBase
                highTickets,
                criticalTickets,
                assignedTickets,
-               unassignedTickets
-          });
+               unassignedTickets,
+               emailCat,
+               accReCat,
+               hardwareCat,
+               networkCat,
+               softwareCat,
+               otherCat,
+
+        });
      }
 }
