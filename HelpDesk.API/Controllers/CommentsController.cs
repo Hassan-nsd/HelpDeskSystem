@@ -61,6 +61,37 @@ namespace HelpDesk.API.Controllers
 
                _context.TicketComments.Add(comment);
 
+               var ticket = await _context.Tickets
+    .FirstOrDefaultAsync(t => t.Id == dto.TicketId);
+
+               if (ticket != null)
+               {
+                    if (ticket.CreatedBy != comment.UserId)
+                    {
+                         _context.Notifications.Add(new Notification
+                         {
+                              UserId = ticket.CreatedBy,
+                              TicketId = ticket.Id,
+                              Message = $"A new comment was added to ticket {ticket.ReferenceNumber}.",
+                              IsRead = false,
+                              CreatedAt = DateTime.UtcNow
+                         });
+                    }
+
+                    if (ticket.AssignedTo.HasValue &&
+                        ticket.AssignedTo.Value != comment.UserId)
+                    {
+                         _context.Notifications.Add(new Notification
+                         {
+                              UserId = ticket.AssignedTo.Value,
+                              TicketId = ticket.Id,
+                              Message = $"A new comment was added to ticket {ticket.ReferenceNumber}.",
+                              IsRead = false,
+                              CreatedAt = DateTime.UtcNow
+                         });
+                    }
+               }
+
                await _context.SaveChangesAsync();
 
                return Ok();

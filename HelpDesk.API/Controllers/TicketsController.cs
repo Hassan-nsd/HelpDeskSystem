@@ -104,8 +104,7 @@ namespace HelpDesk.API.Controllers
 
           [Authorize(Roles = "Admin,Employee,Manager")]
           [HttpPost]
-          public async Task<IActionResult> CreateTicket(
-    CreateTicketDto dto)
+          public async Task<IActionResult> CreateTicket(CreateTicketDto dto)
           {
                var userId = int.Parse(
                    User.FindFirst("userId")!.Value
@@ -117,11 +116,8 @@ namespace HelpDesk.API.Controllers
                     Description = dto.Description,
                     CategoryId = dto.CategoryId,
                     PriorityId = dto.PriorityId,
-
                     CreatedBy = userId,
-
                     StatusId = 1,
-
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
 
@@ -130,6 +126,33 @@ namespace HelpDesk.API.Controllers
                };
 
                _context.Tickets.Add(ticket);
+
+               await _context.SaveChangesAsync();
+
+               _context.Notifications.Add(new Notification
+               {
+                    UserId = userId,
+                    TicketId = ticket.Id,
+                    Message = $"Your ticket ({ticket.ReferenceNumber}) has been created successfully.",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow
+               });
+
+               var adminsAndManagers = await _context.Users
+                   .Where(u => u.RoleId == 1 || u.RoleId == 4)
+                   .ToListAsync();
+
+               foreach (var user in adminsAndManagers)
+               {
+                    _context.Notifications.Add(new Notification
+                    {
+                         UserId = user.Id,
+                         TicketId = ticket.Id,
+                         Message = $"New ticket created: {ticket.ReferenceNumber}",
+                         IsRead = false,
+                         CreatedAt = DateTime.UtcNow
+                    });
+               }
 
                await _context.SaveChangesAsync();
 
@@ -216,6 +239,15 @@ namespace HelpDesk.API.Controllers
                ticket.AssignedTo = dto.UserId;
                ticket.UpdatedAt = DateTime.UtcNow;
 
+               _context.Notifications.Add(new Notification
+               {
+                    UserId = dto.UserId,
+                    TicketId = ticket.Id,
+                    Message = $"A ticket ({ticket.ReferenceNumber}) has been assigned to you.",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow
+               });
+
                await _context.SaveChangesAsync();
 
                return Ok();
@@ -257,6 +289,15 @@ namespace HelpDesk.API.Controllers
 
                ticket.StatusId = statusEntity.Id;
                ticket.UpdatedAt = DateTime.UtcNow;
+
+               _context.Notifications.Add(new Notification
+               {
+                    UserId = ticket.CreatedBy,
+                    TicketId = ticket.Id,
+                    Message = $"Your ticket ({ticket.ReferenceNumber}) status changed to {statusEntity.Name}.",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow
+               });
 
                await _context.SaveChangesAsync();
 

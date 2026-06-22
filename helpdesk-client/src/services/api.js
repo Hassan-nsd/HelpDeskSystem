@@ -227,3 +227,26 @@ export const getReports = async () => {
 
   return await response.json();
 };
+
+export const getNotifications = async () => {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${API_URL}/notifications`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return await response.json();
+};
+
+export const markNotificationAsRead = async (id) => {
+  const token = localStorage.getItem("token");
+
+  await fetch(`${API_URL}/notifications/${id}/read`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
