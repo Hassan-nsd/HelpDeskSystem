@@ -1,7 +1,6 @@
-﻿using HelpDesk.API.Data;
+﻿using HelpDesk.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace HelpDesk.API.Controllers
 {
@@ -10,11 +9,12 @@ namespace HelpDesk.API.Controllers
      [Authorize]
      public class NotificationsController : ControllerBase
      {
-          private readonly AppDbContext _context;
+          private readonly INotificationService
+            _notificationService;
 
-          public NotificationsController(AppDbContext context)
+          public NotificationsController(INotificationService notificationService)
           {
-               _context = context;
+               _notificationService = notificationService;
           }
 
           [HttpGet]
@@ -24,10 +24,8 @@ namespace HelpDesk.API.Controllers
                    User.FindFirst("userId")!.Value
                );
 
-               var notifications = await _context.Notifications
-                   .Where(n => n.UserId == userId)
-                   .OrderByDescending(n => n.CreatedAt)
-                   .ToListAsync();
+               var notifications =
+                await _notificationService.GetNotifications(userId);
 
                return Ok(notifications);
           }
@@ -35,15 +33,11 @@ namespace HelpDesk.API.Controllers
           [HttpPut("{id}/read")]
           public async Task<IActionResult> MarkAsRead(int id)
           {
-               var notification =
-                   await _context.Notifications.FindAsync(id);
+               var success =
+                await _notificationService.MarkAsRead(id);
 
-               if (notification == null)
+               if (!success)
                     return NotFound();
-
-               notification.IsRead = true;
-
-               await _context.SaveChangesAsync();
 
                return Ok();
           }
