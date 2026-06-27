@@ -84,14 +84,6 @@ function NavBar({ isOpen, toggleSidebar }) {
           <span>Users</span>
         </NavLink>
 
-        <NavLink
-          to="/settings"
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          <FaCog />
-          <span>Settings</span>
-        </NavLink>
-
         <a id="logout" onClick={handleLogout}>
           <FaSignOutAlt />
           <span> Logout </span>
