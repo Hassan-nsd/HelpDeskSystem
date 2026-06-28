@@ -1,0 +1,112 @@
+.users-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1%;
+  margin-bottom: 25px;
+}
+
+.users-filters {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.users-filters select {
+  background: #07133d;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 15px;
+  border-radius: 8px;
+  outline: none;
+}
+
+.add-user-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.add-user-btn:hover {
+  background: #1d4ed8;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  min-width: 110px;
+  text-align: center;
+}
+
+.employee {
+  background: #0ea5e9;
+}
+
+.support {
+  background: #8b5cf6;
+}
+
+.admin {
+  background: #ef4444;
+}
+
+.table-card table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.table-card tbody tr {
+  transition: 0.2s;
+}
+
+.table-card tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.table-card td,
+.table-card th {
+  vertical-align: middle;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.action-btn {
+  border: none;
+  background: rgba(255, 255, 255, 0.04);
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.edit-btn:hover {
+  background: #2563eb;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+  color: white;
+}
