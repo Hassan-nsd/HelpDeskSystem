@@ -7,6 +7,7 @@ import CreateTicket from "./pages/createTicket.jsx";
 import TicketDetails from "./pages/ticketDeatils.jsx";
 import Reports from "./pages/Reports.jsx";
 import Users from "./pages/users.jsx";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -25,6 +26,11 @@ function App() {
         <Route path="/reports" element={<Reports />} />
 
         <Route path="/users" element={<Users />} />
+
+        <Route
+          path="/admin/reset-password/:userId"
+          element={<ResetPassword />}
+        />
       </Routes>
     </BrowserRouter>
   );

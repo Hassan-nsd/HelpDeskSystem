@@ -8,5 +8,9 @@ namespace HelpDesk.API.Services.Interfaces
               int userId);
 
           Task<bool> MarkAsRead(int id);
-     }
+
+          Task CreatePasswordHelpRequest(string email);
+
+          Task<bool> ResetPassword(int userId, string password);
+    }
 }

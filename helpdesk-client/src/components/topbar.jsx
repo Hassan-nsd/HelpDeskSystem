@@ -7,7 +7,14 @@ import "../styles/topbar.css";
 function TopBar({ toggleSidebar }) {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
+
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [selectedNotificationId, setSelectedNotificationId] = useState(null);
+  const [newPassword, setNewPassword] = useState("");
+
   const unreadCount = notifications.filter((n) => !n.isRead).length;
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,7 +28,9 @@ function TopBar({ toggleSidebar }) {
   const loadNotifications = async () => {
     try {
       const data = await getNotifications();
+
       console.log("Notifications:", data);
+
       setNotifications(data);
     } catch (err) {
       console.error(err);
@@ -30,16 +39,82 @@ function TopBar({ toggleSidebar }) {
 
   const handleNotificationClick = async (notification) => {
     try {
-      await markNotificationAsRead(notification.id);
-
-      setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
-
+      // Ticket notifications
       if (notification.ticketId) {
+        await markNotificationAsRead(notification.id);
+
+        setNotifications((prev) =>
+          prev.filter((n) => n.id !== notification.id),
+        );
+
         navigate(`/tickets/${notification.ticketId}`);
+        return;
+      }
+
+      // Password help notifications
+      if (notification.targetUserId) {
+        setSelectedUserId(notification.targetUserId);
+
+        setSelectedNotificationId(notification.id);
+
+        setShowResetModal(true);
       }
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleResetPassword = async () => {
+    if (!newPassword) {
+      alert("Please enter a temporary password.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:5213/api/notifications/reset-password/${selectedUserId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            newPassword,
+          }),
+        },
+      );
+
+      if (response.ok) {
+        // Mark notification as read only after success
+        if (selectedNotificationId) {
+          await markNotificationAsRead(selectedNotificationId);
+        }
+
+        setNotifications((prev) =>
+          prev.filter((n) => n.id !== selectedNotificationId),
+        );
+
+        alert("Password reset successfully.");
+
+        setShowResetModal(false);
+        setSelectedUserId(null);
+        setSelectedNotificationId(null);
+        setNewPassword("");
+      } else {
+        alert("Failed to reset password.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server error.");
+    }
+  };
+
+  const closeModal = () => {
+    setShowResetModal(false);
+    setSelectedUserId(null);
+    setSelectedNotificationId(null);
+    setNewPassword("");
   };
 
   function roleName() {
@@ -51,60 +126,92 @@ function TopBar({ toggleSidebar }) {
   }
 
   return (
-    <header className="topbar">
-      <div className="left">
-        <FaBars className="menu-btn" onClick={toggleSidebar} />{" "}
-      </div>
-
-      <div className="right">
-        <div className="notification-wrapper">
-          <FaBell
-            className="icon"
-            onClick={() => setShowNotifications(!showNotifications)}
-          />
-
-          {unreadCount > 0 && (
-            <span className="notification-badge">{unreadCount}</span>
-          )}
-
-          {showNotifications && (
-            <div className="notification-dropdown">
-              <h4>Notifications</h4>
-
-              {notifications.filter((n) => !n.isRead).length === 0 ? (
-                <p className="empty-notification">No new notifications</p>
-              ) : (
-                notifications
-                  .filter((n) => !n.isRead)
-                  .map((notification) => (
-                    <div
-                      key={notification.id}
-                      className={`notification-item ${
-                        !notification.isRead ? "unread" : ""
-                      }`}
-                      onClick={() => handleNotificationClick(notification)}
-                    >
-                      <p>{notification.message}</p>
-
-                      <small>
-                        {new Date(notification.createdAt).toLocaleString()}
-                      </small>
-                    </div>
-                  ))
-              )}
-            </div>
-          )}
+    <>
+      <header className="topbar">
+        <div className="left">
+          <FaBars className="menu-btn" onClick={toggleSidebar} />
         </div>
 
-        <div className="user-info">
-          <FaUserCircle size={35} />
-          <div>
-            <h4>{localStorage.fullName}</h4>
-            <span>{roleName()}</span>
+        <div className="right">
+          <div className="notification-wrapper">
+            <FaBell
+              className="icon"
+              onClick={() => setShowNotifications(!showNotifications)}
+            />
+
+            {unreadCount > 0 && (
+              <span className="notification-badge">{unreadCount}</span>
+            )}
+
+            {showNotifications && (
+              <div className="notification-dropdown">
+                <h4>Notifications</h4>
+
+                {notifications.filter((n) => !n.isRead).length === 0 ? (
+                  <p className="empty-notification">No new notifications</p>
+                ) : (
+                  notifications
+                    .filter((n) => !n.isRead)
+                    .map((notification) => (
+                      <div
+                        key={notification.id}
+                        className={`notification-item ${
+                          !notification.isRead ? "unread" : ""
+                        }`}
+                        onClick={() => handleNotificationClick(notification)}
+                      >
+                        <p>{notification.message}</p>
+
+                        <small>
+                          {new Date(notification.createdAt).toLocaleString()}
+                        </small>
+                      </div>
+                    ))
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="user-info">
+            <FaUserCircle size={35} />
+
+            <div>
+              <h4>{localStorage.fullName}</h4>
+
+              <span>{roleName()}</span>
+            </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Reset Password Modal */}
+      {showResetModal && (
+        <div className="modal-overlay">
+          <div className="reset-modal">
+            <h2>Reset User Password</h2>
+
+            <p>Enter a temporary password for the user.</p>
+
+            <input
+              type="password"
+              placeholder="Temporary password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+
+            <div className="modal-buttons">
+              <button className="cancel-btn" onClick={closeModal}>
+                Cancel
+              </button>
+
+              <button className="save-btn" onClick={handleResetPassword}>
+                Reset Password
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

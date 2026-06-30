@@ -113,6 +113,68 @@
   display: none;
 }
 
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.reset-modal {
+  width: 420px;
+  background-color: #07133d;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.reset-modal h2 {
+  color: white;
+  margin: 0 0 10px;
+}
+
+.reset-modal p {
+  margin-bottom: 20px;
+  color: #666;
+}
+
+.reset-modal input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #666;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  color: white;
+  background-color: #07133d;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancel-btn,
+.save-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: #e5e5e5;
+}
+
+.save-btn {
+  background: #07133d;
+  color: white;
+}
+
 @media (min-width: 577px) and (max-width: 768px) {
   .menu-btn {
     display: none;

@@ -54,6 +54,37 @@ function Login() {
     }
   };
 
+  const handleContactAdmin = async () => {
+    if (!email) {
+      alert("Please enter your email first.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "http://localhost:5213/api/notifications/contact-admin",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("The administrator has been notified.");
+      } else {
+        alert(data.message || "Failed to notify administrator.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server error.");
+    }
+  };
+
   return (
     <div className="login-wrapper">
       <div className="login-container">
@@ -102,22 +133,25 @@ function Login() {
               />
             </div>
 
-            <div className="options">
+            {/* <div className="options">
               <label className="remember">
                 <input type="checkbox" />
                 Remember me
               </label>
 
               <a href="/">Forgot password?</a>
-            </div>
+            </div> */}
 
             <button className="login-btn" type="submit">
               Sign In
             </button>
 
             <div className="footer-text">
-              Don’t have an account?
-              <span> Contact Admin</span>
+              Forgot Password ?
+              <span onClick={handleContactAdmin} style={{ cursor: "pointer" }}>
+                {" "}
+                Contact Admin
+              </span>
             </div>
           </form>
         </div>

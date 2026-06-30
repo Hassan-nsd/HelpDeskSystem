@@ -6,7 +6,9 @@ public class Notification
 
      public int UserId { get; set; }
 
-     public string Message { get; set; } = string.Empty;
+    public int? TargetUserId { get; set; } 
+
+    public string Message { get; set; } = string.Empty;
 
      public bool IsRead { get; set; }
 

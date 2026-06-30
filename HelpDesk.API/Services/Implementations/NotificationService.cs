@@ -35,5 +35,49 @@ namespace HelpDesk.API.Services.Implementations
 
                return true;
           }
-     }
+
+        public async Task CreatePasswordHelpRequest(string email)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null)
+                throw new Exception("User not found");
+
+            var admins = await _context.Users
+                .Where(u => u.RoleId == 1)
+                .ToListAsync();
+
+            foreach (var admin in admins)
+            {
+                _context.Notifications.Add(
+                    new Notification
+                    {
+                        UserId = admin.Id,
+                        TargetUserId = user.Id,
+                        Message = $"{user.Email} requested password assistance",
+                        IsRead = false,
+                        CreatedAt = DateTime.UtcNow
+                    });
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> ResetPassword(
+            int userId,
+            string password)
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+                throw new Exception("User not found");
+
+            user.Password = password;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+    }
 }
