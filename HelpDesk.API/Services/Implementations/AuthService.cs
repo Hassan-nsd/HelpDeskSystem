@@ -92,5 +92,26 @@ namespace HelpDesk.API.Services.Implementations
                     _ => "User"
                };
           }
-     }
+
+        public async Task<bool> ChangePassword(
+            int userId,
+            string currentPassword,
+            string newPassword)
+        {
+            var user =
+                await _context.Users.FindAsync(userId);
+
+            if (user == null)
+                return false;
+
+            if (user.Password != currentPassword)
+                return false;
+
+            user.Password = newPassword;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+    }
 }

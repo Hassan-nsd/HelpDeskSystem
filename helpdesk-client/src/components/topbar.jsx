@@ -7,12 +7,15 @@ import "../styles/topbar.css";
 function TopBar({ toggleSidebar }) {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
-
   const [showResetModal, setShowResetModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [selectedNotificationId, setSelectedNotificationId] = useState(null);
   const [newPassword, setNewPassword] = useState("");
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newUserPassword, setNewUserPassword] = useState("");
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const navigate = useNavigate();
@@ -32,6 +35,42 @@ function TopBar({ toggleSidebar }) {
       console.log("Notifications:", data);
 
       setNotifications(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newUserPassword) {
+      alert("Fill all fields");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "http://localhost:5213/api/auth/change-password",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            currentPassword,
+            newPassword: newUserPassword,
+          }),
+        },
+      );
+
+      if (response.ok) {
+        alert("Password changed successfully");
+
+        setShowChangePasswordModal(false);
+        setCurrentPassword("");
+        setNewUserPassword("");
+      } else {
+        alert("Failed to change password");
+      }
     } catch (err) {
       console.error(err);
     }
@@ -172,17 +211,72 @@ function TopBar({ toggleSidebar }) {
             )}
           </div>
 
-          <div className="user-info">
-            <FaUserCircle size={35} />
+          <div className="profile-wrapper">
+            <div
+              className="user-info"
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+            >
+              <FaUserCircle size={35} />
 
-            <div>
-              <h4>{localStorage.fullName}</h4>
-
-              <span>{roleName()}</span>
+              <div>
+                <h4>
+                  <span id="fullName">{localStorage.fullName}</span>
+                </h4>
+                <span>{roleName()}</span>
+              </div>
             </div>
+
+            {showProfileMenu && (
+              <div className="profile-dropdown">
+                <div
+                  className="profile-item"
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    setShowChangePasswordModal(true);
+                  }}
+                >
+                  🔒 Change Password
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </header>
+
+      {showChangePasswordModal && (
+        <div className="modal-overlay">
+          <div className="reset-modal">
+            <h2>Change Password</h2>
+
+            <input
+              type="password"
+              placeholder="Current password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+            />
+
+            <input
+              type="password"
+              placeholder="New password"
+              value={newUserPassword}
+              onChange={(e) => setNewUserPassword(e.target.value)}
+            />
+
+            <div className="modal-buttons">
+              <button
+                className="cancel-btn"
+                onClick={() => setShowChangePasswordModal(false)}
+              >
+                Cancel
+              </button>
+
+              <button className="save-btn" onClick={handleChangePassword}>
+                Change Password
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Reset Password Modal */}
       {showResetModal && (

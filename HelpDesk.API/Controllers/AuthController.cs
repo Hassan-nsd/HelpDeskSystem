@@ -1,8 +1,9 @@
-using System.Security.Claims;
 using HelpDesk.API.Models;
 using HelpDesk.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace HelpDesk.API.Controllers
 {
@@ -59,6 +60,32 @@ namespace HelpDesk.API.Controllers
                 name = User.Identity?.Name,
                 role = User.FindFirst(ClaimTypes.Role)?.Value
                });
+          }
+
+        [Authorize]
+        [HttpPut("change-password")]
+        public async Task<IActionResult> ChangePassword(
+    ChangePasswordDto dto)
+        {
+            var userId =
+                int.Parse(
+                    User.FindFirst("userId")!.Value
+                );
+
+            var success =
+                await _authService.ChangePassword(
+                    userId,
+                    dto.CurrentPassword,
+                    dto.NewPassword
+                );
+
+            if (!success)
+                return BadRequest(
+                    "Current password is incorrect"
+                );
+
+            return Ok();
         }
-     }
+
+    }
 }
