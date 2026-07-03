@@ -1,4 +1,5 @@
-const API_URL = "http://localhost:5213/api";
+const API_URL =
+  "https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api";
 
 export const getDashboard = async () => {
   const token = localStorage.getItem("token");
@@ -31,7 +32,7 @@ export const getTickets = async () => {
 export const getTicketById = async (id) => {
   const token = localStorage.getItem("token");
 
-  const response = await fetch(`http://localhost:5213/api/tickets/${id}`, {
+  const response = await fetch(`${API_URL}/tickets/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -47,14 +48,11 @@ export const getTicketById = async (id) => {
 export const getAssignableUsers = async () => {
   const token = localStorage.getItem("token");
 
-  const response = await fetch(
-    "http://localhost:5213/api/tickets/assignable-users",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  const response = await fetch(`${API_URL}/tickets/assignable-users`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
-  );
+  });
 
   return await response.json();
 };
@@ -62,21 +60,18 @@ export const getAssignableUsers = async () => {
 export const assignTicket = async (ticketId, userId) => {
   const token = localStorage.getItem("token");
 
-  const response = await fetch(
-    `http://localhost:5213/api/tickets/${ticketId}/assign`,
-    {
-      method: "PUT",
+  const response = await fetch(`${API_URL}/tickets/${ticketId}/assign`, {
+    method: "PUT",
 
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-
-      body: JSON.stringify({
-        userId,
-      }),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
-  );
+
+    body: JSON.stringify({
+      userId,
+    }),
+  });
 
   if (!response.ok) {
     throw new Error("Failed to assign ticket");
@@ -181,9 +176,7 @@ export const updateTicketStatus = async (ticketId, status) => {
 };
 
 export const getAttachments = async (ticketId) => {
-  const response = await fetch(
-    `http://localhost:5213/api/attachments/ticket/${ticketId}`,
-  );
+  const response = await fetch(`${API_URL}/attachments/ticket/${ticketId}`);
 
   if (!response.ok) {
     throw new Error("Failed to load attachments");
@@ -197,13 +190,10 @@ export const uploadAttachment = async (ticketId, file) => {
 
   formData.append("file", file);
 
-  const response = await fetch(
-    `http://localhost:5213/api/attachments/${ticketId}`,
-    {
-      method: "POST",
-      body: formData,
-    },
-  );
+  const response = await fetch(`${API_URL}/attachments/${ticketId}`, {
+    method: "POST",
+    body: formData,
+  });
 
   if (!response.ok) {
     throw new Error("Failed to upload attachment");
@@ -215,7 +205,7 @@ export const uploadAttachment = async (ticketId, file) => {
 export const getReports = async () => {
   const token = localStorage.getItem("token");
 
-  const response = await fetch("http://localhost:5213/api/reports", {
+  const response = await fetch(`${API_URL}/reports`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

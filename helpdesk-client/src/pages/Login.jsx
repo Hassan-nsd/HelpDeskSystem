@@ -14,11 +14,14 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5213/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await fetch(
+        "http://https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        },
+      );
 
       // read raw text first (safe for non-JSON responses)
       const text = await response.text();
@@ -62,7 +65,7 @@ function Login() {
 
     try {
       const response = await fetch(
-        "http://localhost:5213/api/notifications/contact-admin",
+        "http://https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/notifications/contact-admin",
         {
           method: "POST",
           headers: {
