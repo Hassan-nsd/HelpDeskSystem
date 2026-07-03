@@ -24,18 +24,20 @@ builder.Services.AddScoped<IPriorityService, PriorityService>();
 
 builder.Services.AddControllers();
 
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReact",
-        policy =>
-        {
-            policy.WithOrigins(
-                "http://localhost:3000",
-                "https://helpdesksystem-jdoah0hqr-naserdhassan-7269s-projects.vercel.app"
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .WithOrigins(
+                "https://helpdesksystem-rosy.vercel.app",
+                "http://localhost:3000"
             )
             .AllowAnyHeader()
-            .AllowAnyMethod();
-        });
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -69,25 +71,17 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 
-app.UseCors("AllowReact");
+app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-var uploadsPath =
-    Path.Combine(builder.Environment.ContentRootPath, "Uploads");
-
-if (!Directory.Exists(uploadsPath))
-{
-    Directory.CreateDirectory(uploadsPath);
-}
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(uploadsPath),
-    RequestPath = "/attachments"
-});
+app.UseStaticFiles();
 
 app.MapControllers();
-app.UseStaticFiles();
+
 app.Run();
