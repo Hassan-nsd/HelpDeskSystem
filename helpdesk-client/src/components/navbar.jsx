@@ -80,7 +80,7 @@ function NavBar({ isOpen, toggleSidebar }) {
 
         {addReports()}
 
-        {localStorage == 1 && (
+        {localStorage.roleId == 1 && (
           <NavLink
             to="/users"
             className={({ isActive }) => (isActive ? "active" : "")}
