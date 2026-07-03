@@ -26,13 +26,16 @@ builder.Services.AddControllers();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReact", policy =>
-    {
-        policy
-            .WithOrigins("http://localhost:3000")
+    options.AddPolicy("AllowReact",
+        policy =>
+        {
+            policy.WithOrigins(
+                "http://localhost:3000",
+                "https://your-vercel-app.vercel.app"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod();
-    });
+        });
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
