@@ -27,7 +27,7 @@ function CreateTicket() {
       const token = localStorage.getItem("token");
 
       const categoryResponse = await fetch(
-        "http://https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/categories",
+        "https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/categories",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -36,7 +36,7 @@ function CreateTicket() {
       );
 
       const priorityResponse = await fetch(
-        "http://https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/priorities",
+        "https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/priorities",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -65,7 +65,7 @@ function CreateTicket() {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "http://https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/tickets",
+        "https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/tickets",
         {
           method: "POST",
           headers: {

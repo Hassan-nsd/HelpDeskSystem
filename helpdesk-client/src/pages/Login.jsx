@@ -15,7 +15,7 @@ function Login() {
 
     try {
       const response = await fetch(
-        "http://https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/auth/login",
+        "https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/auth/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -65,7 +65,7 @@ function Login() {
 
     try {
       const response = await fetch(
-        "http://https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/notifications/contact-admin",
+        "https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/notifications/contact-admin",
         {
           method: "POST",
           headers: {

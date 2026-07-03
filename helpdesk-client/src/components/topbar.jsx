@@ -48,7 +48,7 @@ function TopBar({ toggleSidebar }) {
 
     try {
       const response = await fetch(
-        "http://https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/auth/change-password",
+        "https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/auth/change-password",
         {
           method: "PUT",
           headers: {
@@ -111,7 +111,7 @@ function TopBar({ toggleSidebar }) {
 
     try {
       const response = await fetch(
-        `http://https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/notifications/reset-password/${selectedUserId}`,
+        `https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/notifications/reset-password/${selectedUserId}`,
         {
           method: "PUT",
           headers: {

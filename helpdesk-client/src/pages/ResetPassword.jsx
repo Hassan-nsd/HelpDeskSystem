@@ -19,7 +19,7 @@ function ResetPassword() {
 
     try {
       const response = await fetch(
-        `http://https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/notifications/reset-password/${userId}`,
+        `https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net/api/notifications/reset-password/${userId}`,
         {
           method: "PUT",
           headers: {
