@@ -20,7 +20,11 @@ function NavBar({ isOpen, toggleSidebar }) {
   };
 
   function addCreateTicket() {
-    if (localStorage.roleId == 1 || localStorage.roleId == 2 || localStorage.roleId == 4) {
+    if (
+      localStorage.roleId == 1 ||
+      localStorage.roleId == 2 ||
+      localStorage.roleId == 4
+    ) {
       return (
         <NavLink
           to="/createTicket"
@@ -76,13 +80,15 @@ function NavBar({ isOpen, toggleSidebar }) {
 
         {addReports()}
 
-        <NavLink
-          to="/users"
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          <FaUsers />
-          <span>Users</span>
-        </NavLink>
+        {localStorage == 1 && (
+          <NavLink
+            to="/users"
+            className={({ isActive }) => (isActive ? "active" : "")}
+          >
+            <FaUsers />
+            <span>Users</span>
+          </NavLink>
+        )}
 
         <a id="logout" onClick={handleLogout}>
           <FaSignOutAlt />
