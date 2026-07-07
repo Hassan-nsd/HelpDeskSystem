@@ -48,21 +48,16 @@ function Tickets() {
   const isAdminOrManager = roleId === 1 || roleId === 4;
 
   useEffect(() => {
-    loadTickets();
-
     const token = localStorage.getItem("token");
+
     if (!token) {
       navigate("/");
+      return;
     }
-  }, []);
 
-  useEffect(() => {
     loadTickets();
     loadDropdowns();
-
-    const token = localStorage.getItem("token");
-    if (!token) navigate("/");
-  }, []);
+  }, [navigate]);
 
   const loadDropdowns = async () => {
     try {
@@ -186,7 +181,7 @@ function Tickets() {
             </thead>
 
             <tbody>
-              {assignedTickets.map((ticket) => (
+              {tickets.map((ticket) => (
                 <tr
                   key={ticket.id}
                   onClick={() => navigate(`/tickets/${ticket.id}`)}
