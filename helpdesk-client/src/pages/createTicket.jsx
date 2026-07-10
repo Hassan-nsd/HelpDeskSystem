@@ -6,7 +6,6 @@ import TopBar from "../components/topbar";
 import createTicket from "../images/create_ticket.png";
 import Select from "react-select/base";
 import { analyzeTicket } from "../services/api";
-import Select from "react-select/base";
 
 function CreateTicket() {
   const [ticket, setTicket] = useState({
