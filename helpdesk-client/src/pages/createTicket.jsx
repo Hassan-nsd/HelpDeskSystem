@@ -5,6 +5,8 @@ import NavBar from "../components/navbar";
 import TopBar from "../components/topbar";
 import createTicket from "../images/create_ticket.png";
 import Select from "react-select/base";
+import { analyzeTicket } from "../services/api";
+import Select from "react-select/base";
 
 function CreateTicket() {
   const [ticket, setTicket] = useState({
@@ -17,6 +19,8 @@ function CreateTicket() {
   const [categories, setCategories] = useState([]);
   const [priorities, setPriorities] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   useEffect(() => {
     loadDropdowns();
@@ -58,6 +62,49 @@ function CreateTicket() {
     });
   };
 
+  const handleAnalyzeTicket = async () => {
+    if (!ticket.title.trim() || !ticket.description.trim()) {
+      alert("Please enter a title and description first.");
+      return;
+    }
+
+    try {
+      setIsAnalyzing(true);
+      setAiAnalysis(null);
+
+      const result = await analyzeTicket(ticket.title, ticket.description);
+
+      setAiAnalysis(result);
+
+      const matchingCategory = categories.find(
+        (category) =>
+          category.name?.trim().toLowerCase() ===
+          result.category?.trim().toLowerCase(),
+      );
+
+      const matchingPriority = priorities.find(
+        (priority) =>
+          priority.name?.trim().toLowerCase() ===
+          result.priority?.trim().toLowerCase(),
+      );
+
+      setTicket((currentTicket) => ({
+        ...currentTicket,
+        categoryId: matchingCategory
+          ? String(matchingCategory.id)
+          : currentTicket.categoryId,
+        priorityId: matchingPriority
+          ? String(matchingPriority.id)
+          : currentTicket.priorityId,
+      }));
+    } catch (error) {
+      console.error("AI analysis failed:", error);
+      alert(error.message || "AI analysis failed.");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -83,6 +130,7 @@ function CreateTicket() {
           categoryId: "",
           priorityId: "",
         });
+        setAiAnalysis(null);
       }
     } catch (error) {
       console.error(error);
@@ -167,8 +215,43 @@ function CreateTicket() {
                     />
                   </div>
 
+                  {aiAnalysis && (
+                    <div className="ai-analysis">
+                      <h3>AI Ticket Analysis</h3>
+
+                      <div className="ai-analysis-row">
+                        <strong>Suggested Category:</strong>
+                        <span>{aiAnalysis.category}</span>
+                      </div>
+
+                      <div className="ai-analysis-row">
+                        <strong>Suggested Priority:</strong>
+                        <span>{aiAnalysis.priority}</span>
+                      </div>
+
+                      <div className="ai-analysis-row">
+                        <strong>Summary:</strong>
+                        <span>{aiAnalysis.summary}</span>
+                      </div>
+
+                      <div className="ai-analysis-row">
+                        <strong>Suggested Reply:</strong>
+                        <span>{aiAnalysis.suggestedReply}</span>
+                      </div>
+                    </div>
+                  )}
+
                   <button type="submit" className="submit-btn">
                     Create Ticket
+                  </button>
+
+                  <button
+                    type="button"
+                    className="ai-analyze-btn"
+                    onClick={handleAnalyzeTicket}
+                    disabled={isAnalyzing}
+                  >
+                    {isAnalyzing ? "Analyzing..." : "✨ Analyze with AI"}
                   </button>
                 </form>
               </div>

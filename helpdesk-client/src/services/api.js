@@ -408,3 +408,25 @@ export const deleteUser = async (id) => {
     throw new Error(error || "Failed to delete user");
   }
 };
+
+export const analyzeTicket = async (title, description) => {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${API_URL}/ai/analyze-ticket`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      title,
+      description,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to analyze ticket");
+  }
+
+  return await response.json();
+};

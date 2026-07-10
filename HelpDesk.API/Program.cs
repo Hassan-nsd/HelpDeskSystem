@@ -1,12 +1,13 @@
 using HelpDesk.API.Data;
+using HelpDesk.API.Mapping;
+using HelpDesk.API.Services;
+using HelpDesk.API.Services.Implementations;
+using HelpDesk.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using HelpDesk.API.Services.Interfaces;
-using HelpDesk.API.Services.Implementations;
-using HelpDesk.API.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddHttpClient<IAiService, AzureOpenAiService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
