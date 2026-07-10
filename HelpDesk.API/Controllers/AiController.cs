@@ -34,11 +34,33 @@ public class AiController : ControllerBase
             });
         }
 
+        if (request.Categories == null || request.Categories.Count == 0)
+        {
+            return BadRequest(new
+            {
+                message = "At least one category is required."
+            });
+        }
+
         try
         {
+            string allowedCategories =
+                string.Join(", ", request.Categories);
+
             string ticketText =
-                $"Title: {request.Title.Trim()}\n" +
-                $"Description: {request.Description.Trim()}";
+                $"""
+                    Analyze this helpdesk ticket.
+
+                    Title: {request.Title.Trim()}
+                    Description: {request.Description.Trim()}
+
+                    Allowed categories:
+                    {allowedCategories}
+
+                    Select exactly one category from the allowed categories.
+                    Never invent a category.
+                    Return only valid JSON.
+                    """;
 
             string result =
                 await _aiService.TestConnectionAsync(ticketText);
@@ -58,6 +80,23 @@ public class AiController : ControllerBase
                     message = "The AI returned an empty response."
                 });
             }
+
+            string? matchingCategory =
+                 request.Categories.FirstOrDefault(category =>
+                 string.Equals(
+                    category.Trim(),
+                    analysis.Category.Trim(),
+                    StringComparison.OrdinalIgnoreCase));
+
+                if (matchingCategory == null)
+                {
+                     return StatusCode(500, new
+                     {
+                        message = "The AI returned an invalid category."
+                     });
+                }
+
+            analysis.Category = matchingCategory;
 
             return Ok(analysis);
         }

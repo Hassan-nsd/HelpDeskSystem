@@ -409,7 +409,7 @@ export const deleteUser = async (id) => {
   }
 };
 
-export const analyzeTicket = async (title, description) => {
+export const analyzeTicket = async (title, description, categories) => {
   const token = localStorage.getItem("token");
 
   const response = await fetch(`${API_URL}/ai/analyze-ticket`, {
@@ -421,11 +421,13 @@ export const analyzeTicket = async (title, description) => {
     body: JSON.stringify({
       title,
       description,
+      categories: categories.map((category) => category.name),
     }),
   });
 
   if (!response.ok) {
-    throw new Error("Failed to analyze ticket");
+    const error = await response.text();
+    throw new Error(error || "Failed to analyze ticket");
   }
 
   return await response.json();

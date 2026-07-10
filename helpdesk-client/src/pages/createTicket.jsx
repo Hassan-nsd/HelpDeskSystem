@@ -71,7 +71,11 @@ function CreateTicket() {
       setIsAnalyzing(true);
       setAiAnalysis(null);
 
-      const result = await analyzeTicket(ticket.title, ticket.description);
+      const result = await analyzeTicket(
+        ticket.title,
+        ticket.description,
+        categories,
+      );
 
       setAiAnalysis(result);
 
@@ -215,27 +219,33 @@ function CreateTicket() {
                   </div>
 
                   {aiAnalysis && (
-                    <div className="ai-analysis">
-                      <h3>AI Ticket Analysis</h3>
+                    <div className="ai-analysis-card">
+                      <div className="ai-header">
+                        <span>✨ AI Analysis</span>
+                      </div>
 
-                      <div className="ai-analysis-row">
-                        <strong>Suggested Category:</strong>
+                      <div className="ai-item">
+                        <label>Category</label>
                         <span>{aiAnalysis.category}</span>
                       </div>
 
-                      <div className="ai-analysis-row">
-                        <strong>Suggested Priority:</strong>
-                        <span>{aiAnalysis.priority}</span>
+                      <div className="ai-item">
+                        <label>Priority</label>
+                        <span
+                          className={`priority-${aiAnalysis.priority?.toLowerCase()}`}
+                        >
+                          {aiAnalysis.priority}
+                        </span>
                       </div>
 
-                      <div className="ai-analysis-row">
-                        <strong>Summary:</strong>
-                        <span>{aiAnalysis.summary}</span>
+                      <div className="ai-item">
+                        <label>Summary</label>
+                        <p>{aiAnalysis.summary}</p>
                       </div>
 
-                      <div className="ai-analysis-row">
-                        <strong>Suggested Reply:</strong>
-                        <span>{aiAnalysis.suggestedReply}</span>
+                      <div className="ai-item">
+                        <label>Suggested Reply</label>
+                        <p>{aiAnalysis.suggestedReply}</p>
                       </div>
                     </div>
                   )}
