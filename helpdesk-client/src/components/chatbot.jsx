@@ -1,22 +1,75 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { sendChatMessage } from "../services/api";
 import "../styles/chatbot.css";
+
+const CHAT_STORAGE_KEY = "helpdeskChatMessages";
+
+const defaultMessages = [
+  {
+    role: "assistant",
+    content: "Hello! How can I help you today?",
+  },
+];
 
 function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([
-    {
-      role: "assistant",
-      content: "Hello! How can I help you today?",
-    },
-  ]);
+  const [isSending, setIsSending] = useState(false);
 
-  const handleSendMessage = (e) => {
+  const messagesEndRef = useRef(null);
+
+  const [messages, setMessages] = useState(() => {
+    try {
+      const savedMessages =
+        sessionStorage.getItem(CHAT_STORAGE_KEY);
+
+      if (!savedMessages) {
+        return defaultMessages;
+      }
+
+      const parsedMessages = JSON.parse(savedMessages);
+
+      return Array.isArray(parsedMessages)
+        ? parsedMessages
+        : defaultMessages;
+    } catch (error) {
+      console.error(
+        "Failed to load chatbot messages:",
+        error,
+      );
+
+      return defaultMessages;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        CHAT_STORAGE_KEY,
+        JSON.stringify(messages),
+      );
+    } catch (error) {
+      console.error(
+        "Failed to save chatbot messages:",
+        error,
+      );
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    if (isOpen) {
+      messagesEndRef.current?.scrollIntoView({
+        behavior: "smooth",
+      });
+    }
+  }, [messages, isSending, isOpen]);
+
+  const handleSendMessage = async (e) => {
     e.preventDefault();
 
     const trimmedMessage = message.trim();
 
-    if (!trimmedMessage) {
+    if (!trimmedMessage || isSending) {
       return;
     }
 
@@ -25,17 +78,71 @@ function Chatbot() {
       content: trimmedMessage,
     };
 
+    const previousMessages = messages;
+
     setMessages((currentMessages) => [
       ...currentMessages,
       userMessage,
-      {
-        role: "assistant",
-        content:
-          "The chatbot interface is working. Azure AI will be connected in the next step.",
-      },
     ]);
 
     setMessage("");
+    setIsSending(true);
+
+    try {
+      const history = previousMessages
+        .filter(
+          (chatMessage) =>
+            chatMessage.role === "user" ||
+            chatMessage.role === "assistant",
+        )
+        .map((chatMessage) => ({
+          role: chatMessage.role,
+          content: chatMessage.content,
+        }));
+
+      const result = await sendChatMessage(
+        trimmedMessage,
+        history,
+      );
+
+      setMessages((currentMessages) => [
+        ...currentMessages,
+        {
+          role: "assistant",
+          content:
+            result.reply ||
+            "I could not generate a response.",
+        },
+      ]);
+    } catch (error) {
+      console.error("Chatbot error:", error);
+
+      setMessages((currentMessages) => [
+        ...currentMessages,
+        {
+          role: "assistant",
+          content:
+            error.message ||
+            "The chatbot is currently unavailable.",
+          isError: true,
+        },
+      ]);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleClearChat = () => {
+    const confirmClear = window.confirm(
+      "Are you sure you want to clear the conversation?",
+    );
+
+    if (!confirmClear) {
+      return;
+    }
+
+    setMessages(defaultMessages);
+    sessionStorage.removeItem(CHAT_STORAGE_KEY);
   };
 
   return (
@@ -45,43 +152,78 @@ function Chatbot() {
           <div className="chatbot-header">
             <div>
               <h3>HelpDesk Assistant</h3>
-              <span>Online</span>
+              <span>
+                {isSending ? "Thinking..." : "Online"}
+              </span>
             </div>
 
-            <button
-              type="button"
-              className="chatbot-close-btn"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close chatbot"
-            >
-              ×
-            </button>
+            <div className="chatbot-header-actions">
+              <button
+                type="button"
+                className="chatbot-clear-btn"
+                onClick={handleClearChat}
+                disabled={isSending}
+              >
+                Clear
+              </button>
+
+              <button
+                type="button"
+                className="chatbot-close-btn"
+                onClick={() => setIsOpen(false)}
+                aria-label="Close chatbot"
+              >
+                ×
+              </button>
+            </div>
           </div>
 
           <div className="chatbot-messages">
             {messages.map((chatMessage, index) => (
               <div
                 key={`${chatMessage.role}-${index}`}
-                className={`chatbot-message ${chatMessage.role}`}
+                className={`chatbot-message ${
+                  chatMessage.role
+                } ${chatMessage.isError ? "error" : ""}`}
               >
                 <div className="chatbot-message-content">
                   {chatMessage.content}
                 </div>
               </div>
             ))}
+
+            {isSending && (
+              <div className="chatbot-message assistant">
+                <div className="chatbot-message-content chatbot-typing">
+                  Thinking...
+                </div>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
           </div>
 
-          <form className="chatbot-input-area" onSubmit={handleSendMessage}>
+          <form
+            className="chatbot-input-area"
+            onSubmit={handleSendMessage}
+          >
             <input
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Describe your issue..."
-              aria-label="Chatbot message"
+              placeholder={
+                isSending
+                  ? "Waiting for a response..."
+                  : "Describe your issue..."
+              }
+              disabled={isSending}
             />
 
-            <button type="submit" disabled={!message.trim()}>
-              Send
+            <button
+              type="submit"
+              disabled={!message.trim() || isSending}
+            >
+              {isSending ? "Sending..." : "Send"}
             </button>
           </form>
         </div>
@@ -90,8 +232,12 @@ function Chatbot() {
       <button
         type="button"
         className="chatbot-toggle-btn"
-        onClick={() => setIsOpen((currentValue) => !currentValue)}
-        aria-label={isOpen ? "Close chatbot" : "Open chatbot"}
+        onClick={() =>
+          setIsOpen((currentValue) => !currentValue)
+        }
+        aria-label={
+          isOpen ? "Close chatbot" : "Open chatbot"
+        }
       >
         {isOpen ? "×" : "💬"}
       </button>

@@ -11,6 +11,7 @@ import {
 import "../styles/Dashboard.css";
 import NavBar from "../components/navbar";
 import TopBar from "../components/topbar";
+import Chatbot from "../components/Chatbot";
 import "../styles/tickets.css";
 
 function Tickets() {
@@ -440,6 +441,7 @@ function Tickets() {
           </div>
         )}
       </main>
+      <Chatbot />
     </div>
   );
 }

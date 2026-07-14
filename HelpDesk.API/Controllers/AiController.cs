@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using HelpDesk.API.DTO;
 using HelpDesk.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -134,4 +135,51 @@ public class AiController : ControllerBase
             });
         }
     }
+
+     [HttpPost("chat")]
+     public async Task<IActionResult> Chat([FromBody] ChatRequestDto request)
+     {
+          if (request == null || string.IsNullOrWhiteSpace(request.Message))
+          {
+               return BadRequest(new
+               {
+                    message = "A chat message is required."
+               });
+          }
+
+          try
+          {
+               var reply = await _aiService.ChatAsync(
+                   request.Message,
+                   request.History
+               );
+
+               return Ok(new
+               {
+                    reply
+               });
+          }
+          catch (HttpRequestException exception)
+          {
+               _logger.LogError(
+                   exception,
+                   "The Azure AI chatbot request failed.");
+
+               return StatusCode(502, new
+               {
+                    message = "The AI service is currently unavailable."
+               });
+          }
+          catch (Exception exception)
+          {
+               _logger.LogError(
+                   exception,
+                   "An unexpected chatbot error occurred.");
+
+               return StatusCode(500, new
+               {
+                    message = "The chatbot is currently unavailable."
+               });
+          }
+     }
 }

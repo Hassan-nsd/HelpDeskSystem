@@ -432,3 +432,38 @@ export const analyzeTicket = async (title, description, categories) => {
 
   return await response.json();
 };
+
+const API_BASE_URL =
+  "https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net";
+
+export const sendChatMessage = async (message, history) => {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${API_BASE_URL}/api/ai/chat`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      message,
+      history,
+    }),
+  });
+
+  let data;
+
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error("The server returned an invalid response.");
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || "The chatbot request failed.",
+    );
+  }
+
+  return data;
+};

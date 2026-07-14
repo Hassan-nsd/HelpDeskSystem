@@ -3,6 +3,7 @@ import TopBar from "../components/topbar";
 import { useState, useEffect, useCallback } from "react";
 import "../styles/Dashboard.css";
 import "../styles/ticketDetails.css";
+import Chatbot from "../components/Chatbot";
 import {
   FaArrowLeft,
   FaDownload,
@@ -487,6 +488,7 @@ function TicketDetails() {
           </div>
         </div>
       </main>
+      <Chatbot />
     </div>
   );
 }

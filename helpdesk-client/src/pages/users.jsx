@@ -11,6 +11,7 @@ import "../styles/Dashboard.css";
 import "../styles/users.css";
 import NavBar from "../components/navbar";
 import TopBar from "../components/topbar";
+import Chatbot from "../components/Chatbot";
 
 function Users() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -383,6 +384,7 @@ function Users() {
               </button>
             </div>
           </div>
+          <Chatbot />
         </div>
       )}
       {showDeleteModal && (
