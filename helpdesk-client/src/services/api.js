@@ -433,11 +433,50 @@ export const analyzeTicket = async (title, description, categories) => {
   return await response.json();
 };
 
+// const API_BASE_URL =
+//   "https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net";
+
+// export const sendChatMessage = async (message, history) => {
+//   const token = localStorage.getItem("token");
+
+//   const response = await fetch(`${API_BASE_URL}/api/ai/chat`, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: `Bearer ${token}`,
+//     },
+//     body: JSON.stringify({
+//       message,
+//       history,
+//     }),
+//   });
+
+//   let data;
+
+//   try {
+//     data = await response.json();
+//   } catch {
+//     throw new Error("The server returned an invalid response.");
+//   }
+
+//   if (!response.ok) {
+//     throw new Error(
+//       data.message || "The chatbot request failed.",
+//     );
+//   }
+
+//   return data;
+// };
+
 const API_BASE_URL =
   "https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net";
 
 export const sendChatMessage = async (message, history) => {
   const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error("You must log in again before using the chatbot.");
+  }
 
   const response = await fetch(`${API_BASE_URL}/api/ai/chat`, {
     method: "POST",
@@ -451,18 +490,34 @@ export const sendChatMessage = async (message, history) => {
     }),
   });
 
-  let data;
+  const responseText = await response.text();
 
-  try {
-    data = await response.json();
-  } catch {
-    throw new Error("The server returned an invalid response.");
+  console.log("Chatbot status:", response.status);
+  console.log("Chatbot content type:", response.headers.get("content-type"));
+  console.log("Chatbot raw response:", responseText);
+
+  let data = null;
+
+  if (responseText) {
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      throw new Error(
+        `Server returned ${response.status} with a non-JSON response. Check the browser console.`,
+      );
+    }
   }
 
   if (!response.ok) {
     throw new Error(
-      data.message || "The chatbot request failed.",
+      data?.message ||
+        data?.details ||
+        `Chatbot request failed with status ${response.status}.`,
     );
+  }
+
+  if (!data?.reply) {
+    throw new Error("The server response did not contain a chatbot reply.");
   }
 
   return data;
