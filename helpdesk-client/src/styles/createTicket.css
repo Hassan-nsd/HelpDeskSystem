@@ -1,6 +1,6 @@
 .create-ticket-page {
   margin-top: 18px;
-  height: calc(100vh - 120px); 
+  height: calc(100vh - 120px);
   display: flex;
   align-items: stretch;
   flex-direction: column;
@@ -12,10 +12,10 @@
 
 .create-ticket-content {
   display: flex;
-  align-items: stretch; 
-  gap: 40px;          
-  flex-wrap: nowrap;    
-  flex: 1; 
+  align-items: stretch;
+  gap: 40px;
+  flex-wrap: nowrap;
+  flex: 1;
   overflow: visible;
 }
 
@@ -24,8 +24,8 @@
   padding: 16px;
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.05);
-  flex: 1; 
-  display: flex;        
+  flex: 1;
+  display: flex;
   flex-direction: column;
   min-width: 450px;
 }
@@ -33,7 +33,7 @@
 .form-card form {
   display: flex;
   flex-direction: column;
-  height: 100%;         
+  height: 100%;
 }
 
 .form-group {
@@ -56,7 +56,6 @@
   border-radius: 10px;
   padding: 10px;
   font-size: 15px;
-  
 }
 
 .form-group input:focus,
@@ -91,8 +90,97 @@
   border-radius: 16px;
   border: 1px solid #00c2ff;
   width: 100%;
-  height: 100%;         
+  height: 100%;
   object-fit: cover;
+}
+
+.ai-analyze-btn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ai-analyze-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+}
+
+.ai-analyze-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.ai-analysis-card {
+  margin-top: 20px;
+  margin-bottom: 20px;
+
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-left: 5px solid #2563eb;
+}
+
+.ai-header {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+
+  margin-bottom: 18px;
+}
+
+.ai-item {
+  margin-bottom: 15px;
+}
+
+.ai-item label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+
+  margin-bottom: 5px;
+}
+
+.ai-item span,
+.ai-item p {
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.priority-high {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.priority-medium {
+  color: #f59e0b;
+  font-weight: 700;
+}
+
+.priority-low {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.priority-critical {
+  color: #991b1b;
+  font-weight: 700;
 }
 
 @media (max-width: 768px) {
@@ -127,7 +215,7 @@
   }
 }
 
-@media (max-width: 1200px){
+@media (max-width: 1200px) {
   .image {
     display: none;
   }
