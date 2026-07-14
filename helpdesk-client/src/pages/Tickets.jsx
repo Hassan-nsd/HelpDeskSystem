@@ -29,8 +29,10 @@ function Tickets() {
     priorityId: "",
     categoryId: "",
   });
-  const assignedTickets = tickets.filter((t) => t.assignedTo !== null);
-  const unassignedTickets = tickets.filter((t) => t.assignedTo === null);
+  const [allTickets, setAllTickets] = useState([]);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [priorityFilter, setPriorityFilter] = useState("all");
+  const [assignmentFilter, setAssignmentFilter] = useState("all");
   const roleId = Number(localStorage.roleId);
   const canEdit = (ticket) => {
     if (roleId === 1 || roleId === 4) return true;
@@ -74,10 +76,37 @@ function Tickets() {
   const loadTickets = async () => {
     try {
       const data = await getTickets();
+      setAllTickets(data);
       setTickets(data);
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const applyFilters = (status, priority, assignment) => {
+    let filtered = [...allTickets];
+
+    if (status !== "all") {
+      filtered = filtered.filter(
+        (t) => t.status?.toLowerCase() === status.toLowerCase(),
+      );
+    }
+
+    if (priority !== "all") {
+      filtered = filtered.filter(
+        (t) => t.priority?.toLowerCase() === priority.toLowerCase(),
+      );
+    }
+
+    if (assignment !== "all") {
+      if (assignment === "assigned") {
+        filtered = filtered.filter((t) => t.assignedTo !== null);
+      } else {
+        filtered = filtered.filter((t) => t.assignedTo === null);
+      }
+    }
+
+    setTickets(filtered);
   };
 
   function roleName() {
@@ -115,7 +144,10 @@ function Tickets() {
     try {
       await deleteTicket(ticketToDelete);
 
-      setTickets((prev) => prev.filter((t) => t.id !== ticketToDelete));
+      const updatedTickets = allTickets.filter((t) => t.id !== ticketToDelete);
+
+      setAllTickets(updatedTickets);
+      setTickets(updatedTickets);
 
       setShowDeleteModal(false);
       setTicketToDelete(null);
@@ -167,7 +199,60 @@ function Tickets() {
       <main className="main-content">
         <TopBar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
-        <h2 className="page-title">My Tickets</h2>
+        <div className="users-header">
+          <h2 className="page-title">Tickets</h2>
+
+          <div className="users-filters">
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                const value = e.target.value;
+                setStatusFilter(value);
+                applyFilters(value, priorityFilter, assignmentFilter);
+              }}
+            >
+              <option value="all">All Status</option>
+              <option value="open">Open</option>
+              <option value="in progress">In Progress</option>
+              <option value="pending">Pending</option>
+              <option value="resolved">Resolved</option>
+              <option value="closed">Closed</option>
+            </select>
+
+            <select
+              value={priorityFilter}
+              onChange={(e) => {
+                const value = e.target.value;
+                setPriorityFilter(value);
+                applyFilters(statusFilter, value, assignmentFilter);
+              }}
+            >
+              <option value="all">All Priorities</option>
+
+              {priorities.map((priority) => (
+                <option key={priority.id} value={priority.name.toLowerCase()}>
+                  {priority.name}
+                </option>
+              ))}
+            </select>
+
+            {(roleId === 1 || roleId === 4) && (
+              <select
+                value={assignmentFilter}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setAssignmentFilter(value);
+                  applyFilters(statusFilter, priorityFilter, value);
+                }}
+              >
+                <option value="all">All Tickets</option>
+                <option value="assigned">Assigned</option>
+                <option value="unassigned">Unassigned</option>
+              </select>
+            )}
+          </div>
+        </div>
+
         <div className="table-card">
           <table>
             <thead>
@@ -181,124 +266,71 @@ function Tickets() {
             </thead>
 
             <tbody>
-              {tickets.map((ticket) => (
-                <tr
-                  key={ticket.id}
-                  onClick={() => navigate(`/tickets/${ticket.id}`)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <td>{ticket.referenceNumber}</td>
-                  <td>{ticket.title}</td>
-                  <td>
-                    <span className={`status ${getStatusClass(ticket.status)}`}>
-                      {ticket.status}
-                    </span>
-                  </td>
-                  <td>
-                    <span
-                      className={`priority ${getPriorityClass(ticket.priority)}`}
-                    >
-                      {ticket.priority}
-                    </span>
-                  </td>
-                  <td className="actions" onClick={(e) => e.stopPropagation()}>
-                    {canEdit(ticket) && (
-                      <button
-                        className="action-btn edit-btn"
-                        onClick={() => openEdit(ticket)}
-                      >
-                        <FaEdit />
-                      </button>
-                    )}
-
-                    {canDelete(ticket) && (
-                      <button
-                        className="action-btn delete-btn"
-                        onClick={() => {
-                          setTicketToDelete(ticket.id);
-                          setShowDeleteModal(true);
-                        }}
-                      >
-                        <FaTrash />
-                      </button>
-                    )}
+              {tickets.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="no-data">
+                    No tickets found.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                tickets.map((ticket) => (
+                  <tr
+                    key={ticket.id}
+                    onClick={() => navigate(`/tickets/${ticket.id}`)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <td>{ticket.referenceNumber}</td>
+
+                    <td>{ticket.title}</td>
+
+                    <td>
+                      <span
+                        className={`status ${getStatusClass(ticket.status)}`}
+                      >
+                        {ticket.status}
+                      </span>
+                    </td>
+
+                    <td>
+                      <span
+                        className={`priority ${getPriorityClass(ticket.priority)}`}
+                      >
+                        {ticket.priority}
+                      </span>
+                    </td>
+
+                    <td
+                      className="actions"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {canEdit(ticket) && (
+                        <button
+                          className="action-btn edit-btn"
+                          onClick={() => openEdit(ticket)}
+                        >
+                          <FaEdit />
+                        </button>
+                      )}
+
+                      {canDelete(ticket) && (
+                        <button
+                          className="action-btn delete-btn"
+                          onClick={() => {
+                            setTicketToDelete(ticket.id);
+                            setShowDeleteModal(true);
+                          }}
+                        >
+                          <FaTrash />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
 
-        {isAdminOrManager && (
-          <>
-            <h2 className="page-title">Unassigned Tickets </h2>
-            <div className="table-card">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Ref</th>
-                    <th>Title</th>
-                    <th>Status</th>
-                    <th>Priority</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {unassignedTickets.map((ticket) => (
-                    <tr
-                      key={ticket.id}
-                      onClick={() => navigate(`/tickets/${ticket.id}`)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <td>{ticket.referenceNumber}</td>
-                      <td>{ticket.title}</td>
-                      <td>
-                        <span
-                          className={`status ${getStatusClass(ticket.status)}`}
-                        >
-                          {ticket.status}
-                        </span>
-                      </td>
-                      <td>
-                        <span
-                          className={`priority ${getPriorityClass(ticket.priority)}`}
-                        >
-                          {ticket.priority}
-                        </span>
-                      </td>
-                      <td
-                        className="actions"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {canEdit(ticket) && (
-                          <button
-                            className="action-btn edit-btn"
-                            onClick={() => openEdit(ticket)}
-                          >
-                            <FaEdit />
-                          </button>
-                        )}
-
-                        {canDelete(ticket) && (
-                          <button
-                            className="action-btn delete-btn"
-                            onClick={() => {
-                              setTicketToDelete(ticket.id);
-                              setShowDeleteModal(true);
-                            }}
-                          >
-                            <FaTrash />
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
         {showEditModal && (
           <div className="modal-overlay">
             <div className="edit-modal">
