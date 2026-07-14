@@ -11,7 +11,7 @@ import "../styles/Dashboard.css";
 import "../styles/users.css";
 import NavBar from "../components/navbar";
 import TopBar from "../components/topbar";
-import Chatbot from "../components/Chatbot";
+import Chatbot from "../components/chatbot";
 
 function Users() {
   const [sidebarOpen, setSidebarOpen] = useState(false);

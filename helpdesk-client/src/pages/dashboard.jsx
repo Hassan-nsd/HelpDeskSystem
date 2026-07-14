@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getDashboard } from "../services/api";
 import NavBar from "../components/navbar";
 import TopBar from "../components/topbar";
-import Chatbot from "../components/Chatbot";
+import Chatbot from "../components/chatbot";
 
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 

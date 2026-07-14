@@ -11,7 +11,7 @@ import {
 import "../styles/Dashboard.css";
 import NavBar from "../components/navbar";
 import TopBar from "../components/topbar";
-import Chatbot from "../components/Chatbot";
+import Chatbot from "../components/chatbot";
 import "../styles/tickets.css";
 
 function Tickets() {

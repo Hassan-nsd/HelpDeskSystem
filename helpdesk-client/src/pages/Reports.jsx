@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import NavBar from "../components/navbar";
 import TopBar from "../components/topbar";
 import { getReports } from "../services/api";
-import Chatbot from "../components/Chatbot";
+import Chatbot from "../components/chatbot";
 
 import {
   PieChart,
