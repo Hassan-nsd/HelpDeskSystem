@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { sendChatMessage } from "../services/api";
+import {
+  clearChatHistory,
+  getChatHistory,
+  sendChatMessage,
+} from "../services/api";
 import "../styles/chatbot.css";
 
 const CHAT_STORAGE_KEY = "helpdeskChatMessages";
@@ -20,8 +24,7 @@ function Chatbot() {
 
   const [messages, setMessages] = useState(() => {
     try {
-      const savedMessages =
-        sessionStorage.getItem(CHAT_STORAGE_KEY);
+      const savedMessages = sessionStorage.getItem(CHAT_STORAGE_KEY);
 
       if (!savedMessages) {
         return defaultMessages;
@@ -29,30 +32,42 @@ function Chatbot() {
 
       const parsedMessages = JSON.parse(savedMessages);
 
-      return Array.isArray(parsedMessages)
-        ? parsedMessages
-        : defaultMessages;
+      return Array.isArray(parsedMessages) ? parsedMessages : defaultMessages;
     } catch (error) {
-      console.error(
-        "Failed to load chatbot messages:",
-        error,
-      );
+      console.error("Failed to load chatbot messages:", error);
 
       return defaultMessages;
     }
   });
 
   useEffect(() => {
+    const loadChatHistory = async () => {
+      try {
+        const savedMessages = await getChatHistory();
+
+        if (Array.isArray(savedMessages) && savedMessages.length > 0) {
+          setMessages(
+            savedMessages.map((savedMessage) => ({
+              role: savedMessage.role,
+              content: savedMessage.content,
+            })),
+          );
+        } else {
+          setMessages(defaultMessages);
+        }
+      } catch (error) {
+        console.error("Failed to load database chat history:", error);
+      }
+    };
+
+    loadChatHistory();
+  }, []);
+
+  useEffect(() => {
     try {
-      sessionStorage.setItem(
-        CHAT_STORAGE_KEY,
-        JSON.stringify(messages),
-      );
+      sessionStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
     } catch (error) {
-      console.error(
-        "Failed to save chatbot messages:",
-        error,
-      );
+      console.error("Failed to save chatbot messages:", error);
     }
   }, [messages]);
 
@@ -80,10 +95,7 @@ function Chatbot() {
 
     const previousMessages = messages;
 
-    setMessages((currentMessages) => [
-      ...currentMessages,
-      userMessage,
-    ]);
+    setMessages((currentMessages) => [...currentMessages, userMessage]);
 
     setMessage("");
     setIsSending(true);
@@ -92,26 +104,20 @@ function Chatbot() {
       const history = previousMessages
         .filter(
           (chatMessage) =>
-            chatMessage.role === "user" ||
-            chatMessage.role === "assistant",
+            chatMessage.role === "user" || chatMessage.role === "assistant",
         )
         .map((chatMessage) => ({
           role: chatMessage.role,
           content: chatMessage.content,
         }));
 
-      const result = await sendChatMessage(
-        trimmedMessage,
-        history,
-      );
+      const result = await sendChatMessage(trimmedMessage, history);
 
       setMessages((currentMessages) => [
         ...currentMessages,
         {
           role: "assistant",
-          content:
-            result.reply ||
-            "I could not generate a response.",
+          content: result.reply || "I could not generate a response.",
         },
       ]);
     } catch (error) {
@@ -121,9 +127,7 @@ function Chatbot() {
         ...currentMessages,
         {
           role: "assistant",
-          content:
-            error.message ||
-            "The chatbot is currently unavailable.",
+          content: error.message || "The chatbot is currently unavailable.",
           isError: true,
         },
       ]);
@@ -132,17 +136,25 @@ function Chatbot() {
     }
   };
 
-  const handleClearChat = () => {
+  const handleClearChat = async () => {
     const confirmClear = window.confirm(
       "Are you sure you want to clear the conversation?",
     );
 
-    if (!confirmClear) {
+    if (!confirmClear || isSending) {
       return;
     }
 
-    setMessages(defaultMessages);
-    sessionStorage.removeItem(CHAT_STORAGE_KEY);
+    try {
+      await clearChatHistory();
+
+      setMessages(defaultMessages);
+      sessionStorage.removeItem(CHAT_STORAGE_KEY);
+    } catch (error) {
+      console.error("Failed to clear chat:", error);
+
+      window.alert(error.message || "Failed to clear the conversation.");
+    }
   };
 
   return (
@@ -152,9 +164,7 @@ function Chatbot() {
           <div className="chatbot-header">
             <div>
               <h3>HelpDesk Assistant</h3>
-              <span>
-                {isSending ? "Thinking..." : "Online"}
-              </span>
+              <span>{isSending ? "Thinking..." : "Online"}</span>
             </div>
 
             <div className="chatbot-header-actions">
@@ -203,10 +213,7 @@ function Chatbot() {
             <div ref={messagesEndRef} />
           </div>
 
-          <form
-            className="chatbot-input-area"
-            onSubmit={handleSendMessage}
-          >
+          <form className="chatbot-input-area" onSubmit={handleSendMessage}>
             <input
               type="text"
               value={message}
@@ -219,10 +226,7 @@ function Chatbot() {
               disabled={isSending}
             />
 
-            <button
-              type="submit"
-              disabled={!message.trim() || isSending}
-            >
+            <button type="submit" disabled={!message.trim() || isSending}>
               {isSending ? "Sending..." : "Send"}
             </button>
           </form>
@@ -232,12 +236,8 @@ function Chatbot() {
       <button
         type="button"
         className="chatbot-toggle-btn"
-        onClick={() =>
-          setIsOpen((currentValue) => !currentValue)
-        }
-        aria-label={
-          isOpen ? "Close chatbot" : "Open chatbot"
-        }
+        onClick={() => setIsOpen((currentValue) => !currentValue)}
+        aria-label={isOpen ? "Close chatbot" : "Open chatbot"}
       >
         {isOpen ? "×" : "💬"}
       </button>

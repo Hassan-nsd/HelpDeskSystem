@@ -433,44 +433,6 @@ export const analyzeTicket = async (title, description, categories) => {
   return await response.json();
 };
 
-// const API_BASE_URL =
-//   "https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net";
-
-// export const sendChatMessage = async (message, history) => {
-//   const token = localStorage.getItem("token");
-
-//   const response = await fetch(`${API_BASE_URL}/api/ai/chat`, {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//       Authorization: `Bearer ${token}`,
-//     },
-//     body: JSON.stringify({
-//       message,
-//       history,
-//     }),
-//   });
-
-//   let data;
-
-//   try {
-//     data = await response.json();
-//   } catch {
-//     throw new Error("The server returned an invalid response.");
-//   }
-
-//   if (!response.ok) {
-//     throw new Error(
-//       data.message || "The chatbot request failed.",
-//     );
-//   }
-
-//   return data;
-// };
-
-const API_BASE_URL =
-  "https://helpdesk-api-hassan-byhgdng9emaadxbq.francecentral-01.azurewebsites.net";
-
 export const sendChatMessage = async (message, history) => {
   const token = localStorage.getItem("token");
 
@@ -478,7 +440,7 @@ export const sendChatMessage = async (message, history) => {
     throw new Error("You must log in again before using the chatbot.");
   }
 
-  const response = await fetch(`${API_BASE_URL}/api/ai/chat`, {
+  const response = await fetch(`${API_URL}/ai/chat`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -521,4 +483,35 @@ export const sendChatMessage = async (message, history) => {
   }
 
   return data;
+};
+
+export const getChatHistory = async () => {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${API_URL}/ai/chat/history`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to load chat history.");
+  }
+
+  return response.json();
+};
+
+export const clearChatHistory = async () => {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${API_URL}/ai/chat/history`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to clear chat history.");
+  }
 };
