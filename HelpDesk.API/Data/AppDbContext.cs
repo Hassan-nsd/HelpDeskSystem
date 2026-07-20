@@ -26,7 +26,7 @@ namespace HelpDesk.API.Data
 
         public DbSet<TicketAttachment> TicketAttachments { get; set; }
 
-        public DbSet<Notification> Notifications { get; set; 
+        public DbSet<Notification> Notifications { get; set; }
 
         public DbSet<ChatConversation> ChatConversations { get; set; }
 

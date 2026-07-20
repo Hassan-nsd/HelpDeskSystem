@@ -157,7 +157,7 @@ public class AiController : ControllerBase
         }
 
         var userIdValue =
-            User.FindFirstValue(ClaimTypes.NameIdentifier);
+            User.FindFirst("userId")?.Value;
 
         if (!int.TryParse(userIdValue, out var userId))
         {
@@ -264,7 +264,7 @@ public class AiController : ControllerBase
     public async Task<IActionResult> GetChatHistory()
     {
         var userIdValue =
-            User.FindFirstValue(ClaimTypes.NameIdentifier);
+            User.FindFirst("userId")?.Value;
 
         if (!int.TryParse(userIdValue, out var userId))
         {
@@ -305,7 +305,7 @@ public class AiController : ControllerBase
     public async Task<IActionResult> ClearChatHistory()
     {
         var userIdValue =
-            User.FindFirstValue(ClaimTypes.NameIdentifier);
+            User.FindFirst("userId")?.Value;
 
         if (!int.TryParse(userIdValue, out var userId))
         {
